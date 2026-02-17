@@ -1,0 +1,24 @@
+{
+  "name": "@devjams/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@devjams/db": "workspace:*",
+    "@devjams/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@devjams/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

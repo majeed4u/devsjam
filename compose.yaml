@@ -1,0 +1,48 @@
+services:
+  devjams-server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile.server
+    image: devjams-server:latest
+    # ports:
+    #   - "3300:3000"
+    environment:
+      - CORS_ORIGIN=https://devjams-stg-web.local.majedtec.com
+      - DATABASE_URL=postgresql://postgres:majed@123@192.168.3.31:5432/devjams_stg
+      - BETTER_AUTH_URL=https://devjams-stg-api.local.majedtec.com
+      - BETTER_AUTH_SECRET=OHgRyAzg67dRcuEf4lHuRhiV8AzgvQ7C
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.devjams-server.rule=Host(`devjams-stg-api.local.majedtec.com`)"
+      - "traefik.http.routers.devjams-server.entrypoints=https"
+      - "traefik.http.routers.devjams-server.tls=true"
+      - "traefik.http.routers.devjams-server.tls.certresolver=cloudflare"
+      - "traefik.http.routers.devjams-server.service=devjams-server-svc"
+      - "traefik.http.services.devjams-server-svc.loadbalancer.server.port=3000"
+    networks:
+      - proxymg
+  devjams-web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.web
+    image: devjams-web:latest
+    # ports:
+    #   - "8800:80"
+    environment:
+      - SERVER_URL=https://devjams-stg-api.local.majedtec.com
+      - ENV=staging
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.devjams-web.rule=Host(`devjams-stg-web.local.majedtec.com`)"
+      - "traefik.http.routers.devjams-web.entrypoints=https"
+      - "traefik.http.routers.devjams-web.tls=true"
+      - "traefik.http.routers.devjams-web.tls.certresolver=cloudflare"
+      - "traefik.http.routers.devjams-web.service=devjams-web-svc"
+      - "traefik.http.services.devjams-web-svc.loadbalancer.server.port=80"
+    networks:
+      - proxymg
+    depends_on:
+      - devjams-server
+networks:
+  proxymg:
+    external: true

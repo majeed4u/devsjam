@@ -1,6 +1,6 @@
-import { env } from "@devjams/env/web";
+import { SERVER_URL } from "@/config";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: env.VITE_SERVER_URL,
+  baseURL: SERVER_URL,
 });

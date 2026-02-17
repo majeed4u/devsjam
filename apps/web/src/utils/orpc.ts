@@ -1,6 +1,5 @@
 import type { AppRouterClient } from "@devjams/api/routers/index";
-
-import { env } from "@devjams/env/web";
+import { SERVER_URL } from "@/config";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
@@ -21,7 +20,7 @@ export const queryClient = new QueryClient({
 });
 
 export const link = new RPCLink({
-  url: `${env.VITE_SERVER_URL}/rpc`,
+  url: `${SERVER_URL}/rpc`,
   fetch(url, options) {
     return fetch(url, {
       ...options,

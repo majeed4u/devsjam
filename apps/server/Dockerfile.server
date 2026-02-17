@@ -1,0 +1,44 @@
+FROM oven/bun:1 AS pruner
+WORKDIR /repo
+COPY . .
+RUN bunx turbo prune server --docker --out-dir /repo/out
+
+# Install all dependencies needed to build the server workspace
+FROM oven/bun:1 AS installer
+WORKDIR /app
+COPY --from=pruner /repo/out/json/ ./
+RUN bun install --frozen-lockfile
+
+# Build the server bundle using the pruned source tree
+FROM installer AS builder
+WORKDIR /app
+COPY --from=pruner /repo/out/full/ ./
+ENV NODE_ENV=production
+ENV DATABASE_URL="postgresql://postgres:password@localhost:5432/mydb?connect_timeout=5"
+RUN cd packages/db && bun db:generate
+RUN bun run build -F server
+
+# Re-install only production dependencies for the runtime image
+FROM oven/bun:1 AS prod-installer
+WORKDIR /app
+COPY --from=pruner /repo/out/json/ ./
+# We need prisma CLI for db push at runtime.
+# We add it as a dependency here to ensure it's available in the final image
+RUN bun install --frozen-lockfile --production && bun add prisma
+
+FROM oven/bun:1 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Install curl so container health checks can probe the service
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=prod-installer /app/node_modules ./node_modules
+COPY --from=builder /app/apps/server/dist ./dist
+COPY --from=builder /app/packages/db/prisma ./packages/db/prisma
+COPY --from=builder /app/packages/db/prisma.config.ts ./packages/db/prisma.config.ts
+
+EXPOSE 3000
+CMD ["/bin/sh", "-c", "cd packages/db && bunx prisma db push && cd ../.. && bun dist/index.mjs"]

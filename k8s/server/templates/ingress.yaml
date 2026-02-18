@@ -1,0 +1,28 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "devjams-deployment.fullname" . }}
+  labels:
+    {{- include "devjams-deployment.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  {{- range .Values.ingress.hosts }}
+  - kind: Rule
+    match: Host(`{{ .host }}`) && PathPrefix(`{{ range .paths }}{{ .path }}{{ end }}`)
+    middlewares:
+    {{- if $.Values.middleware.enabled }}
+    - name: {{ include "devjams-deployment.fullname" $ }}-default-headers
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    services:
+    - name: {{ include "devjams-deployment.fullname" $ }}
+      port: {{ $.Values.service.port }}
+  {{- end }}
+  {{- if .Values.certificate.enabled }}
+  tls:
+    secretName: {{ .Values.certificate.secretName }}
+  {{- end }}

@@ -1,0 +1,11 @@
+{{- if .Values.middleware.enabled -}}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "devjams-web.fullname" . }}-default-headers
+  labels:
+    {{- include "devjams-web.labels" . | nindent 4 }}
+spec:
+  headers:
+    {{- toYaml .Values.middleware.headers | nindent 4 }}
+{{- end }}

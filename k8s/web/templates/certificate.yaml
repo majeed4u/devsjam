@@ -1,0 +1,20 @@
+{{- if .Values.certificate.enabled -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "devjams-web.fullname" . }}-tls-cert
+  labels:
+    {{- include "devjams-web.labels" . | nindent 4 }}
+spec:
+  commonName: {{ .Values.certificate.commonName | quote }}
+  dnsNames:
+  {{- if .Values.certificate.dnsNames }}
+  {{- toYaml .Values.certificate.dnsNames | nindent 4 }}
+  {{- else }}
+  - {{ .Values.certificate.commonName | quote }}
+  {{- end }}
+  issuerRef:
+    kind: {{ .Values.certificate.issuer.kind }}
+    name: {{ .Values.certificate.issuer.name }}
+  secretName: {{ .Values.certificate.secretName }}
+{{- end }}

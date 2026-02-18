@@ -1,0 +1,30 @@
+# Staging Environment Values
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - host: web-staging.internalk.majedtec.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+config:
+  serverUrl: "https://server-staging.internalk.majedtec.com"
+  env: "staging"
+
+certificate:
+  enabled: true
+  commonName: "*.internalk.majedtec.com"
+  issuer:
+    kind: ClusterIssuer
+    name: letsencrypt-staging
+  secretName: web-tls-staging

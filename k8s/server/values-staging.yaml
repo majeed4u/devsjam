@@ -1,0 +1,33 @@
+# Staging Environment Values
+# Override default values.yaml for staging
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - host: server-staging.internalk.majedtec.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+config:
+  betterAuthSecret: "staging-secret-key-change-me"
+  betterAuthUrl: "https://server-staging.internalk.majedtec.com"
+  corsOrigin: "https://web-staging.internalk.majedtec.com"
+
+certificate:
+  enabled: true
+  commonName: "*.internalk.majedtec.com"
+  issuer:
+    kind: ClusterIssuer
+    name: letsencrypt-staging
+  secretName: server-tls-staging

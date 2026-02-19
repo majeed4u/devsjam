@@ -1,48 +1,98 @@
-FROM oven/bun:1 AS pruner
+############################
+# 1️⃣ Prune monorepo
+############################
+FROM oven/bun:1.2.15 AS pruner
+
 WORKDIR /repo
 COPY . .
+
+# Use repo version of turbo (more deterministic)
+RUN bun add -d turbo@^2.6.3
+
 RUN bunx turbo prune server --docker --out-dir /repo/out
 
-# Install all dependencies needed to build the server workspace
-FROM oven/bun:1 AS installer
-WORKDIR /app
-COPY --from=pruner /repo/out/json/ ./
-RUN --mount=type=cache,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile
 
-# Build the server bundle using the pruned source tree
-FROM installer AS builder
+
+############################
+# 2️⃣ Install dependencies
+############################
+FROM oven/bun:1.2.15 AS installer
+
 WORKDIR /app
+
+# Copy only package.json + lockfiles from pruned output
+COPY --from=pruner /repo/out/json/ ./
+
+# Clean bun cache to avoid Jenkins corruption issues
+RUN rm -rf /root/.bun \
+    && bun install --frozen-lockfile
+
+
+
+############################
+# 3️⃣ Build stage
+############################
+FROM installer AS builder
+
+WORKDIR /app
+
+# Copy full pruned source
 COPY --from=pruner /repo/out/full/ ./
+
 ENV NODE_ENV=production
-# Dummy DATABASE_URL used only during build for Prisma generation (not a secret).
-# If you need a real DB during build, use --build-arg or CI secrets — do NOT hardcode credentials.
+
+# Dummy DB URL for prisma generate (NOT used at runtime)
 ENV DATABASE_URL="postgresql://postgres:password@127.0.0.1:5432/devjams?connect_timeout=5"
+
+# Generate prisma client
 RUN cd packages/db && bun db:generate
+
+# Build only server workspace
 RUN bun run build -F server
 
-# Install only production dependencies for the runtime image (trim devDependencies)
-FROM installer AS prod-deps
-WORKDIR /app
-COPY --from=pruner /repo/out/json/ ./
-RUN --mount=type=cache,target=/root/.bun/install/cache \
-    # Install production deps and ensure `prisma` CLI is available at runtime
-    RUN bun install --frozen-lockfile --production && bun add prisma
 
-FROM oven/bun:1 AS runner
+
+############################
+# 4️⃣ Production deps only
+############################
+FROM oven/bun:1.2.15 AS prod-deps
+
+WORKDIR /app
+
+COPY --from=pruner /repo/out/json/ ./
+
+# Install production deps only
+RUN rm -rf /root/.bun \
+    && bun install --frozen-lockfile --production
+
+# Prisma CLI needed at runtime for db push
+RUN bun add prisma
+
+
+
+############################
+# 5️⃣ Final runtime image
+############################
+FROM oven/bun:1.2.15 AS runner
+
 WORKDIR /app
 ENV NODE_ENV=production
 
-# curl removed from final image to reduce size and avoid network-dependent apt steps
-# Health checks and probes should run externally (Kubernetes / Traefik).
+# Copy production node_modules
 COPY --from=prod-deps /app/node_modules ./node_modules
+
+# Copy built server
 COPY --from=builder /app/apps/server/dist ./dist
+
+# Copy prisma files
 COPY --from=builder /app/packages/db/prisma ./packages/db/prisma
 COPY --from=builder /app/packages/db/prisma.config.ts ./packages/db/prisma.config.ts
 
-EXPOSE 3000
-# Use an entrypoint that runs `prisma db push` with retries, then execs the app
+# Copy entrypoint
 COPY apps/server/docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
+
+EXPOSE 3000
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["bun", "dist/index.mjs"]

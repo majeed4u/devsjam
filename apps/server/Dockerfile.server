@@ -14,17 +14,18 @@ FROM installer AS builder
 WORKDIR /app
 COPY --from=pruner /repo/out/full/ ./
 ENV NODE_ENV=production
-ENV DATABASE_URL="postgresql://postgres:password@localhost:5432/mydb?connect_timeout=5"
+# Dummy DATABASE_URL used only during build for Prisma generation (not a secret).
+# If you need a real DB during build, use --build-arg or CI secrets — do NOT hardcode credentials.
+ENV DATABASE_URL="postgresql://postgres:password@127.0.0.1:5432/devjams?connect_timeout=5"
 RUN cd packages/db && bun db:generate
 RUN bun run build -F server
 
-# Re-install only production dependencies for the runtime image
-FROM oven/bun:1 AS prod-installer
+# Install only production dependencies for the runtime image (trim devDependencies)
+FROM installer AS prod-deps
 WORKDIR /app
 COPY --from=pruner /repo/out/json/ ./
-# Reuse node_modules from the `installer` stage to avoid re-downloading native binaries
-# (prevents integrity errors during CI docker builds)
-COPY --from=installer /app/node_modules ./node_modules
+# Install production deps and ensure `prisma` CLI is available at runtime
+RUN bun install --frozen-lockfile --production && bun add prisma
 
 FROM oven/bun:1 AS runner
 WORKDIR /app
@@ -32,10 +33,14 @@ ENV NODE_ENV=production
 
 # curl removed from final image to reduce size and avoid network-dependent apt steps
 # Health checks and probes should run externally (Kubernetes / Traefik).
-COPY --from=prod-installer /app/node_modules ./node_modules
+COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/apps/server/dist ./dist
 COPY --from=builder /app/packages/db/prisma ./packages/db/prisma
 COPY --from=builder /app/packages/db/prisma.config.ts ./packages/db/prisma.config.ts
 
 EXPOSE 3000
-CMD ["/bin/sh", "-c", "cd packages/db && bunx prisma db push && cd ../.. && bun dist/index.mjs"]
+# Use an entrypoint that runs `prisma db push` with retries, then execs the app
+COPY apps/server/docker/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["bun", "dist/index.mjs"]

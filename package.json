@@ -31,7 +31,7 @@
     "db:push": "turbo -F @devjams/db db:push",
     "db:studio": "turbo -F @devjams/db db:studio",
     "db:generate": "turbo -F @devjams/db db:generate",
-    "db:migrate": "turbo -F @devjams/db db:migrate",
+    "db:migrate": "turbo -F @devjams/db db:migrate dev",
     "check": "biome check --write ."
   },
   "dependencies": {

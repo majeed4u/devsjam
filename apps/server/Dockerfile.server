@@ -22,9 +22,9 @@ RUN bun run build -F server
 FROM oven/bun:1 AS prod-installer
 WORKDIR /app
 COPY --from=pruner /repo/out/json/ ./
-# We need prisma CLI for db push at runtime.
-# We add it as a dependency here to ensure it's available in the final image
-RUN bun install --frozen-lockfile --production && bun add prisma
+# Reuse node_modules from the `installer` stage to avoid re-downloading native binaries
+# (prevents integrity errors during CI docker builds)
+COPY --from=installer /app/node_modules ./node_modules
 
 FROM oven/bun:1 AS runner
 WORKDIR /app

@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Pull from Git') {
             steps {
-                git branch: 'main', credentialsId: 'github_cred', url: 'https://github.com/majeed4u/devsjam.git'
+                git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
             }
         }
 

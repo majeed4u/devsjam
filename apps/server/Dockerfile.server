@@ -7,7 +7,8 @@ RUN bunx turbo prune server --docker --out-dir /repo/out
 FROM oven/bun:1 AS installer
 WORKDIR /app
 COPY --from=pruner /repo/out/json/ ./
-RUN bun install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile
 
 # Build the server bundle using the pruned source tree
 FROM installer AS builder
@@ -24,8 +25,9 @@ RUN bun run build -F server
 FROM installer AS prod-deps
 WORKDIR /app
 COPY --from=pruner /repo/out/json/ ./
-# Install production deps and ensure `prisma` CLI is available at runtime
-RUN bun install --frozen-lockfile --production && bun add prisma
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    # Install production deps and ensure `prisma` CLI is available at runtime
+    RUN bun install --frozen-lockfile --production && bun add prisma
 
 FROM oven/bun:1 AS runner
 WORKDIR /app

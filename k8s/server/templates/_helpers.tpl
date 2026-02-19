@@ -64,13 +64,4 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "devjams-deployment.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "devjams-deployment.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
+

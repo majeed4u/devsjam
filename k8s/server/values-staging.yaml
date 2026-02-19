@@ -20,7 +20,7 @@ resources:
     memory: 128Mi
 
 config:
-  betterAuthSecret: "staging-secret-key-change-me"
+  betterAuthSecret: "OHgRyAzg67dRcuEf4lHuRhiV8AzgvQ7B"
   betterAuthUrl: "https://server-staging.internalk.majedtec.com"
   corsOrigin: "https://web-staging.internalk.majedtec.com"
 
@@ -31,3 +31,8 @@ certificate:
     kind: ClusterIssuer
     name: letsencrypt-staging
   secretName: server-tls-staging
+
+secrets:
+  # DO NOT COMMIT ACTUAL SECRETS TO GIT
+  # Pass this value during deployment: --set secrets.databaseUrl="..."
+  databaseUrl: ""

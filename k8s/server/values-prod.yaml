@@ -37,3 +37,8 @@ certificate:
     kind: ClusterIssuer
     name: letsencrypt-production
   secretName: server-tls-prod
+
+secrets:
+  # DO NOT COMMIT ACTUAL SECRETS TO GIT
+  # Pass this value during deployment: --set secrets.databaseUrl="..."
+  databaseUrl: ""

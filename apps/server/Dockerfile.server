@@ -30,11 +30,8 @@ FROM oven/bun:1 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Install curl so container health checks can probe the service
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
-
+# curl removed from final image to reduce size and avoid network-dependent apt steps
+# Health checks and probes should run externally (Kubernetes / Traefik).
 COPY --from=prod-installer /app/node_modules ./node_modules
 COPY --from=builder /app/apps/server/dist ./dist
 COPY --from=builder /app/packages/db/prisma ./packages/db/prisma

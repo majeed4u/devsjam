@@ -76,3 +76,22 @@ devjams/
 - `bun run db:migrate`: Run database migrations
 - `bun run db:studio`: Open database studio UI
 - `bun run check`: Run Biome formatting and linting
+
+
+
+
+helm upgrade --install devjams-web-staging ./k8s/web \
+  -f k8s/web/values-staging.yaml \
+  --namespace staging --create-namespace
+
+
+helm upgrade --install devjams-server-staging ./k8s/server \
+  -f k8s/server/values-staging.yaml \
+  --namespace staging --create-namespace
+
+
+export DB_PASSWORD="my-super-secret-password"
+helm upgrade --install devjams-server ./k8s/server \
+  -f k8s/server/values-staging.yaml \
+  --set secrets.databaseUrl="postgresql://postgres:${DB_PASSWORD}@192.168.3.31:5432/devjams_stg" \
+  --namespace staging --create-namespace

@@ -25,7 +25,7 @@ COPY --from=pruner /repo/out/json/ ./
 
 # Clean bun cache to avoid Jenkins corruption issues
 RUN rm -rf /root/.bun \
-    && bun install --frozen-lockfile
+    && bun install --frozen-lockfile --no-cache
 
 
 
@@ -63,7 +63,7 @@ COPY --from=pruner /repo/out/json/ ./
 
 # Install production deps only
 RUN rm -rf /root/.bun \
-    && bun install --frozen-lockfile --production
+    && bun install --frozen-lockfile --production --no-cache
 
 # Prisma CLI needed at runtime for db push
 RUN bun add prisma

@@ -11,7 +11,9 @@ pipeline {
                 script {
                     def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
                     echo "Changed files:\n${changed}"
-                    if (!(changed =~ /^(apps\/server|packages\/api|packages\/db)/)) {
+                    def lines = changed.split('\n')
+                    def relevant = lines.any { it.startsWith('apps/server/') || it.startsWith('packages/api/') || it.startsWith('packages/db/') }
+                    if (!relevant) {
                         echo 'No server-related files changed; skipping server build.'
                         currentBuild.result = 'SUCCESS'
                         return
@@ -62,6 +64,7 @@ pipeline {
 
                         git add server/values.yaml
                         git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                        git pull --rebase origin main || true
                         git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devjams-k8s.git
                     '''
                 }

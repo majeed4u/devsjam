@@ -13,7 +13,9 @@ pipeline {
                 script {
                     def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
                     echo "Changed files:\n${changed}"
-                    if (!(changed =~ /^(apps\/web|packages\/api)/)) {
+                    def lines = changed.split('\n')
+                    def relevant = lines.any { it.startsWith('apps/web/') || it.startsWith('packages/api/') }
+                    if (!relevant) {
                         echo 'No web-related files changed; skipping web build.'
                         currentBuild.result = 'SUCCESS'
                         return
@@ -60,6 +62,7 @@ pipeline {
 
                         git add web/values.yaml
                         git commit -m "Updated web tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                        git pull --rebase origin main || true
                         git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devjams-k8s.git
                     '''
                 }

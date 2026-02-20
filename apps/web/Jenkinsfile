@@ -1,11 +1,8 @@
-
-
-
 pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-server"
+        IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-web"
         IMAGE_TAG = "${env.BUILD_ID}"
     }
 
@@ -13,7 +10,6 @@ pipeline {
         stage('Self-trigger check') {
             steps {
                 script {
-                    // examine commit messages to see if this build was started by our own tag update
                     def skip = currentBuild.changeSets
                         .collect { it.items }
                         .flatten()
@@ -21,7 +17,6 @@ pipeline {
                     if (skip) {
                         echo 'Build triggered by self‑update commit ([ci skip]); aborting.'
                         currentBuild.result = 'SUCCESS'
-                        // throwing to stop the pipeline
                         error('Aborting due to self-trigger')
                     }
                 }
@@ -31,11 +26,10 @@ pipeline {
         stage('Skip irrelevant paths') {
             steps {
                 script {
-                    // only run backend pipeline when relevant files changed
                     def changed = sh(script: 'git diff --name-only HEAD^ HEAD || true', returnStdout: true).trim()
                     echo "Files changed:\n${changed}"
-                    if (!(changed =~ /^(apps\/server|packages\/api)\//)) {
-                        echo 'No backend-related files modified; skipping build.'
+                    if (!(changed =~ /^(apps\/web)/)) {
+                        echo 'No frontend-related files modified; skipping build.'
                         currentBuild.result = 'SUCCESS'
                         error('Irrelevant change')
                     }
@@ -56,7 +50,7 @@ pipeline {
                     # Login to Gitea
                     echo ${GITEA_TOKEN} | docker login gitea.mjdev.dev -u ${GITEA_USERNAME} --password-stdin
                     
-                    docker build -f apps/server/Dockerfile.server -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker build -f apps/web/Dockerfile.web -t ${IMAGE_NAME}:${IMAGE_TAG} .
                     docker push ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
@@ -74,11 +68,11 @@ pipeline {
                     git config --global user.name "majeed4u"
 
                     # Update the tag in the YAML file (handles quoted version like "1.0.0")
-                    sed -i 's/tag: "[0-9.]*"/tag: "'"${IMAGE_TAG}"'/' k8s/server/values.yaml
+                    sed -i 's/tag: "[0-9.]*"/tag: "'"${IMAGE_TAG}"'"/' k8s/web/values.yaml
 
                     # Add and commit if there are changes (include skip token to prevent webhook looping)
-                    git add k8s/server/values.yaml
-                    git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                    git add k8s/web/values.yaml
+                    git commit -m "Updated web tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
 
                     # Push using credentials in URL
                     git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
@@ -86,7 +80,5 @@ pipeline {
                 }
             }
         }
-
-        
     }
 }

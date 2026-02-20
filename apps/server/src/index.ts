@@ -82,7 +82,7 @@ const app = new Elysia()
     });
     return response ?? new Response("Not Found", { status: 404 });
   })
-  .get("/", () => "OK");
+  .get("/", () => "OK - DevJams Server");
 app.listen({
   port: 3000,
   hostname: "0.0.0.0",

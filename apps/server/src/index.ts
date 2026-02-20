@@ -9,7 +9,10 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { Elysia } from "elysia";
-
+import { rateLimit } from "elysia-rate-limit";
+import { healthcheckPlugin } from "elysia-healthcheck";
+import { sentry } from "elysiajs-sentry";
+import logixlysia from "logixlysia";
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
     onError((error) => {
@@ -31,12 +34,31 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 });
 
 const app = new Elysia()
+
   .use(
     cors({
       origin: [env.CORS_ORIGIN],
       methods: ["GET", "POST", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
+    }),
+  )
+  .use(healthcheckPlugin())
+  .use(rateLimit())
+  .use(sentry())
+  .use(
+    logixlysia({
+      config: {
+        showStartupMessage: true,
+        startupMessageFormat: "simple",
+        timestamp: {
+          translateTime: "yyyy-mm-dd HH:MM:ss.SSS",
+        },
+        logFilePath: "./logs/example.log",
+        ip: true,
+        customLogFormat:
+          "🦊 {now} {level} {duration} {method} {pathname} {status} {message} {ip}",
+      },
     }),
   )
   .all("/api/auth/*", async (context) => {
@@ -60,13 +82,8 @@ const app = new Elysia()
     });
     return response ?? new Response("Not Found", { status: 404 });
   })
-  .get("/", () => "OK")
-  .listen(
-    {
-      port: 3000,
-      hostname: "0.0.0.0",
-    },
-    () => {
-      console.log("Server is running on http://0.0.0.0:3000");
-    },
-  );
+  .get("/", () => "OK");
+app.listen({
+  port: 3000,
+  hostname: "0.0.0.0",
+});

@@ -15,9 +15,9 @@ pipeline {
                         .flatten()
                         .any { it.msg =~ /\[ci skip\]/ }
                     if (skip) {
-                        echo 'Build triggered by self‑update commit ([ci skip]); aborting.'
+                        echo 'Build triggered by self‑update commit ([ci skip]); aborting early.'
                         currentBuild.result = 'SUCCESS'
-                        error('Aborting due to self-trigger')
+                        return
                     }
                 }
             }

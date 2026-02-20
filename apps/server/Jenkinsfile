@@ -19,10 +19,10 @@ pipeline {
                         .flatten()
                         .any { it.msg =~ /\[ci skip\]/ }
                     if (skip) {
-                        echo 'Build triggered by self‑update commit ([ci skip]); aborting.'
+                        echo 'Build triggered by self‑update commit ([ci skip]); aborting early.'
                         currentBuild.result = 'SUCCESS'
-                        // throwing to stop the pipeline
-                        error('Aborting due to self-trigger')
+                        // return from the pipeline script to stop further stages without failure
+                        return
                     }
                 }
             }

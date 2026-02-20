@@ -9,14 +9,12 @@ pipeline {
         stage('Check commit message') {
             steps {
                 script {
-                    // Get the latest commit message from git directly (more reliable than changeSets)
                     def msg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
                     echo "Commit message: ${msg}"
 
                     if (msg.contains('[ci skip]')) {
                         echo 'Triggered by self-update commit ([ci skip]). Aborting.'
                         currentBuild.result = 'SUCCESS'
-                        // This actually stops the pipeline in declarative syntax:
                         error('[ci skip] detected — stopping pipeline intentionally.')
                     }
                 }
@@ -27,13 +25,12 @@ pipeline {
             steps {
                 script {
                     def changed = sh(
-                        script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || git diff --name-only HEAD 2>/dev/null || echo "UNKNOWN"',
+                        script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true',
                         returnStdout: true
                     ).trim()
 
                     echo "Changed files:\n${changed}"
 
-                    // Check if ANY changed file is under the relevant paths
                     def relevant = changed.split('\n').any { file ->
                         file.startsWith('apps/server/') || file.startsWith('packages/api/')
                     }
@@ -86,28 +83,12 @@ pipeline {
                         git config --global user.name "majeed4u"
 
                         sed -i 's|^ tag:.*| tag: "'"${IMAGE_TAG}"'"|' k8s/server/values.yaml
+                        sed -i '/^ tag: "[^"]*$/ s/$/"/' k8s/server/values.yaml
 
                         git add k8s/server/values.yaml
-
-                        # Only commit+push if there's actually a change
-                        if git diff --cached --quiet; then
-                            echo "No changes to commit."
-                        else
-                            git commit -m "Updated server tag to ${IMAGE_TAG} [ci skip]"
-                            git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
-                        fi
+                        git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                        git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
                     '''
-                }
-            }
-        }
-    }
-
-    post {
-        failure {
-            script {
-                // Don't mark intentional skips as failures
-                if (currentBuild.result == 'SUCCESS') {
-                    echo 'Pipeline was intentionally stopped early — not a real failure.'
                 }
             }
         }

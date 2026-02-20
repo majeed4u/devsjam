@@ -48,7 +48,7 @@ pipeline {
                     git commit -m "Updated login tag to '"${IMAGE_TAG}"'" || echo "No changes to commit"
 
                     # Push using credentials in URL
-                    git push https://${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
+                    git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
                     '''
                 }
             }

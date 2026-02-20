@@ -34,22 +34,21 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github_pat_cred', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
                     git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
 
-                    sh """
+                    sh '''
+                    # Set git identity (required for commits)
+                    git config --global user.email "jamodah20@gmail.com"
+                    git config --global user.name "majeed4u"
+
                     # Update the tag in the YAML file
-                    sed -i 's/tag: [0-9]\\+/tag: ${IMAGE_TAG}/' k8s/server/values.yaml
+                    sed -i 's/tag: [0-9]\+/tag: '"${IMAGE_TAG}"'/' k8s/server/values.yaml
 
                     # Force add and commit if there are changes
                     git add k8s/server/values.yaml
-                    git commit -m "Updated login tag to ${IMAGE_TAG}" || echo "No changes to commit"
+                    git commit -m "Updated login tag to '"${IMAGE_TAG}"'" || echo "No changes to commit"
 
-                    # Ensure git can authenticate using the stored credentials
-                    git config --global credential.helper 'store'
-                    echo "machine github.com login ${GITHUB_USERNAME} password ${GITHUB_PASSWORD}" > ~/.netrc
-                    chmod 600 ~/.netrc
-
-                    # Push the changes
-                    git push https://github.com/majeed4u/devsjam.git
-                    """
+                    # Push using the credentials from the credential binding
+                    git push https://'"${GITHUB_USERNAME}"'@'"${GITHUB_PASSWORD}"'@github.com/majeed4u/devsjam.git
+                    '''
                 }
             }
         }

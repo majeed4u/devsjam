@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.6
+
 ############################
 # 1️⃣ Prune monorepo
 ############################
@@ -6,24 +8,24 @@ FROM oven/bun:1.3.9 AS pruner
 WORKDIR /repo
 COPY . .
 
-# Use bunx to run turbo directly without installing it
+# Prune only the server workspace for Docker
 RUN bunx --yes turbo prune server --docker --out-dir /repo/out
 
 
 
 ############################
-# 2️⃣ Install dependencies
+# 2️⃣ Install dependencies (CACHED)
 ############################
 FROM oven/bun:1.3.9 AS installer
 
 WORKDIR /app
 
-# Copy only package.json + lockfiles from pruned output
+# Copy only dependency files from pruned output
 COPY --from=pruner /repo/out/json/ ./
 
-# Clean bun cache to avoid Jenkins corruption issues
-RUN rm -rf /root/.bun \
-    && bun install --frozen-lockfile --no-cache
+# Use BuildKit cache for Bun
+RUN --mount=type=cache,target=/root/.bun \
+    bun install --frozen-lockfile
 
 
 
@@ -39,10 +41,10 @@ COPY --from=pruner /repo/out/full/ ./
 
 ENV NODE_ENV=production
 
-# Dummy DB URL for prisma generate (NOT used at runtime)
+# Dummy DB URL for prisma generate
 ENV DATABASE_URL="postgresql://postgres:password@127.0.0.1:5432/devjams?connect_timeout=5"
 
-# Generate prisma client
+# Generate Prisma client
 RUN cd packages/db && bun db:generate
 
 # Build only server workspace
@@ -51,7 +53,7 @@ RUN bun run build -F server
 
 
 ############################
-# 4️⃣ Production deps only
+# 4️⃣ Production deps only (CACHED)
 ############################
 FROM oven/bun:1.3.9 AS prod-deps
 
@@ -59,11 +61,9 @@ WORKDIR /app
 
 COPY --from=pruner /repo/out/json/ ./
 
-# Install production deps only
-# Note: Not using --production since we need prisma CLI at runtime
-# The extra dev deps are minimal compared to total image size
-RUN rm -rf /root/.bun \
-    && bun install --frozen-lockfile --no-cache
+# Use cache again
+RUN --mount=type=cache,target=/root/.bun \
+    bun install --frozen-lockfile
 
 
 

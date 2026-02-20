@@ -17,7 +17,7 @@ pipeline {
 
         stage('Login and build image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github_pat_cred', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
+                withCredentials([usernamePassword(credentialsId: 'ghcr_cred', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
                     sh """
                     # Login to GHCR
                     echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${GITHUB_USERNAME} --password-stdin

@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.6
-
 ############################
 # 1️⃣ Prune monorepo
 ############################
@@ -8,24 +6,24 @@ FROM oven/bun:1.3.9 AS pruner
 WORKDIR /repo
 COPY . .
 
-# Prune only the server workspace for Docker
+# Use bunx to run turbo directly without installing it
 RUN bunx --yes turbo prune server --docker --out-dir /repo/out
 
 
 
 ############################
-# 2️⃣ Install dependencies (CACHED)
+# 2️⃣ Install dependencies
 ############################
-FROM oven/bun:1.3.9 AS installer
+FROM oven/bun:1 AS installer
 
 WORKDIR /app
 
-# Copy only dependency files from pruned output
+# Copy only package.json + lockfiles from pruned output
 COPY --from=pruner /repo/out/json/ ./
 
-# Use BuildKit cache for Bun
-RUN --mount=type=cache,target=/root/.bun \
-    bun install --frozen-lockfile
+# Clean bun cache to avoid Jenkins corruption issues
+RUN rm -rf /root/.bun \
+    && bun install --frozen-lockfile --no-cache
 
 
 
@@ -41,10 +39,10 @@ COPY --from=pruner /repo/out/full/ ./
 
 ENV NODE_ENV=production
 
-# Dummy DB URL for prisma generate
+# Dummy DB URL for prisma generate (NOT used at runtime)
 ENV DATABASE_URL="postgresql://postgres:password@127.0.0.1:5432/devjams?connect_timeout=5"
 
-# Generate Prisma client
+# Generate prisma client
 RUN cd packages/db && bun db:generate
 
 # Build only server workspace
@@ -53,24 +51,26 @@ RUN bun run build -F server
 
 
 ############################
-# 4️⃣ Production deps only (CACHED)
+# 4️⃣ Production deps only
 ############################
-FROM oven/bun:1.3.9 AS prod-deps
+FROM oven/bun:1 AS prod-deps
 
 WORKDIR /app
 
 COPY --from=pruner /repo/out/json/ ./
 
-# Use cache again
-RUN --mount=type=cache,target=/root/.bun \
-    bun install --frozen-lockfile
+# Install production deps only
+# Note: Not using --production since we need prisma CLI at runtime
+# The extra dev deps are minimal compared to total image size
+RUN rm -rf /root/.bun \
+    && bun install --frozen-lockfile --no-cache
 
 
 
 ############################
 # 5️⃣ Final runtime image
 ############################
-FROM oven/bun:1.3.9 AS runner
+FROM oven/bun:1 AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production

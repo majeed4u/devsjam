@@ -6,7 +6,10 @@ RUN bunx turbo prune web --docker --out-dir /repo/out
 FROM oven/bun:1 AS deps
 WORKDIR /app
 COPY --from=pruner /repo/out/json/ ./
-RUN bun install --frozen-lockfile
+
+# Clean bun cache to avoid corrupted lockfile issues when building
+RUN rm -rf /root/.bun \
+    && bun install --no-cache
 
 FROM deps AS builder
 WORKDIR /app

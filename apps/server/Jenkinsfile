@@ -3,6 +3,7 @@ pipeline {
     environment {
         IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-server"
         IMAGE_TAG  = "${env.BUILD_ID}"
+        RELEVANT   = 'true'
     }
     stages {
 
@@ -15,14 +16,14 @@ pipeline {
                     def relevant = lines.any { it.startsWith('apps/server/') || it.startsWith('packages/api/') || it.startsWith('packages/db/') }
                     if (!relevant) {
                         echo 'No server-related files changed; skipping server build.'
-                        currentBuild.result = 'SUCCESS'
-                        return
+                        env.RELEVANT = 'false'
                     }
                 }
             }
         }
 
         stage('Pull from Git') {
+            when { environment name: 'RELEVANT', value: 'true' }
             steps {
                 git branch: 'main',
                     credentialsId: 'github_pat_cred',
@@ -31,6 +32,7 @@ pipeline {
         }
 
         stage('Login and build image') {
+            when { environment name: 'RELEVANT', value: 'true' }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'gitea_cred',
@@ -47,6 +49,7 @@ pipeline {
         }
 
         stage('Update Tag') {
+            when { environment name: 'RELEVANT', value: 'true' }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr_cred',

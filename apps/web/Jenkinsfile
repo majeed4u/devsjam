@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-web"
         IMAGE_TAG = "${env.BUILD_ID}"
+        RELEVANT = 'true'
     }
 
     stages {
@@ -17,20 +18,21 @@ pipeline {
                     def relevant = lines.any { it.startsWith('apps/web/') || it.startsWith('packages/api/') }
                     if (!relevant) {
                         echo 'No web-related files changed; skipping web build.'
-                        currentBuild.result = 'SUCCESS'
-                        return
+                        env.RELEVANT = 'false'
                     }
                 }
             }
         }
 
         stage('Pull from Git') {
+            when { environment name: 'RELEVANT', value: 'true' }
             steps {
                 git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
             }
         }
 
         stage('Login and build image') {
+            when { environment name: 'RELEVANT', value: 'true' }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gitea_cred', passwordVariable: 'GITEA_TOKEN', usernameVariable: 'GITEA_USERNAME')]) {
                     sh """
@@ -45,6 +47,7 @@ pipeline {
         }
 
         stage('Update Tag') {
+            when { environment name: 'RELEVANT', value: 'true' }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr_cred',

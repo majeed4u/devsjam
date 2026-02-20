@@ -73,11 +73,11 @@ pipeline {
                     git config --global user.email "jamodah20@gmail.com"
                     git config --global user.name "majeed4u"
 
-                    # Update the tag in the YAML file (handles quoted version like "1.0.0").
-                    # If the line is malformed (missing closing quote) replace it entirely.
-                    sed -i 's/^  tag: *"[0-9.]*"/  tag: "'"${IMAGE_TAG}"'"/; t; s/^  tag:.*/  tag: "'"${IMAGE_TAG}"'"/' k8s/server/values.yaml
-                    # ensure closing quote still exists
-                    sed -i 's/^  tag: "\([^"]*\)$/  tag: "\1"/' k8s/server/values.yaml
+                    # Update the tag in the YAML file.  We'll simply rewrite the entire
+                    # `tag:` line which avoids any tricky escaping in the Jenkinsfile.
+                    sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' k8s/server/values.yaml
+                    # if somehow the closing quote is missing, append it
+                    sed -i '/^  tag: "[^"]*$/ s/$/"/' k8s/server/values.yaml
 
                     # Add and commit if there are changes (include skip token to prevent webhook looping)
                     git add k8s/server/values.yaml

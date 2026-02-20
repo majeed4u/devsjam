@@ -67,9 +67,10 @@ pipeline {
                     git config --global user.email "jamodah20@gmail.com"
                     git config --global user.name "majeed4u"
 
-                    # Update the tag in the YAML file (handles quoted version like "1.0.0").
-                    sed -i 's/^  tag: *"[0-9.]*"/  tag: "'"${IMAGE_TAG}"'"/; t; s/^  tag:.*/  tag: "'"${IMAGE_TAG}"'"/' k8s/web/values.yaml
-                    sed -i 's/^  tag: "\([^"]*\)$/  tag: "\1"/' k8s/web/values.yaml
+                    # Update the tag in the YAML file by replacing the whole line.
+                    sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' k8s/web/values.yaml
+                    # ensure trailing quote exists
+                    sed -i '/^  tag: "[^"]*$/ s/$/"/' k8s/web/values.yaml
 
                     # Add and commit if there are changes (include skip token to prevent webhook looping)
                     git add k8s/web/values.yaml

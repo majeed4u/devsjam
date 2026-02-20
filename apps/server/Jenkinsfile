@@ -13,7 +13,7 @@ pipeline {
                     def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
                     echo "Changed files:\n${changed}"
                     def lines = changed.split('\n')
-                    def relevant = lines.any { it.startsWith('apps/server/') || it.startsWith('packages/api/') || it.startsWith('packages/db/') }
+                    def relevant = lines.any { (it.startsWith('apps/server/') && !it.endsWith('Jenkinsfile')) || it.startsWith('packages/api/') || it.startsWith('packages/db/') }
                     if (!relevant) {
                         echo 'No server-related files changed; skipping server build.'
                         env.RELEVANT = 'false'
@@ -23,7 +23,7 @@ pipeline {
         }
 
         stage('Pull from Git') {
-            when { environment name: 'RELEVANT', value: 'true' }
+            when { expression { return env.RELEVANT == 'true' } }
             steps {
                 git branch: 'main',
                     credentialsId: 'github_pat_cred',
@@ -32,7 +32,7 @@ pipeline {
         }
 
         stage('Login and build image') {
-            when { environment name: 'RELEVANT', value: 'true' }
+            when { expression { return env.RELEVANT == 'true' } }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'gitea_cred',
@@ -49,7 +49,7 @@ pipeline {
         }
 
         stage('Update Tag') {
-            when { environment name: 'RELEVANT', value: 'true' }
+            when { expression { return env.RELEVANT == 'true' } }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr_cred',

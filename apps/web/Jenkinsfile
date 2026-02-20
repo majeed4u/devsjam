@@ -15,7 +15,7 @@ pipeline {
                     def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
                     echo "Changed files:\n${changed}"
                     def lines = changed.split('\n')
-                    def relevant = lines.any { it.startsWith('apps/web/') || it.startsWith('packages/api/') }
+                    def relevant = lines.any { it.startsWith('apps/web/') && !it.endsWith('Jenkinsfile') || it.startsWith('packages/api/') }
                     if (!relevant) {
                         echo 'No web-related files changed; skipping web build.'
                         env.RELEVANT = 'false'
@@ -25,14 +25,14 @@ pipeline {
         }
 
         stage('Pull from Git') {
-            when { environment name: 'RELEVANT', value: 'true' }
+            when { expression { return env.RELEVANT == 'true' } }
             steps {
                 git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
             }
         }
 
         stage('Login and build image') {
-            when { environment name: 'RELEVANT', value: 'true' }
+            when { expression { return env.RELEVANT == 'true' } }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gitea_cred', passwordVariable: 'GITEA_TOKEN', usernameVariable: 'GITEA_USERNAME')]) {
                     sh """
@@ -47,7 +47,7 @@ pipeline {
         }
 
         stage('Update Tag') {
-            when { environment name: 'RELEVANT', value: 'true' }
+            when { expression { return env.RELEVANT == 'true' } }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr_cred',

@@ -33,7 +33,7 @@ pipeline {
         stage('Update Tag') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github_pat_cred', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                    git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
+                    git branch: 'main', credentialsId: 'ghcr_cred', url: 'https://github.com/majeed4u/devsjam.git'
 
                     sh '''
                     # Set git identity (required for commits)

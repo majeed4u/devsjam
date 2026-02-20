@@ -95,3 +95,6 @@ helm upgrade --install devjams-server ./k8s/server \
   -f k8s/server/values-staging.yaml \
   --set secrets.databaseUrl="postgresql://postgres:${DB_PASSWORD}@192.168.3.31:5432/devjams_stg" \
   --namespace staging --create-namespace
+
+
+  <!-- 7a0130fafe19ca73863e28f2543ffd418720aeae -->

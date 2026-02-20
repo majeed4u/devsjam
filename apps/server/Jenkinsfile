@@ -25,11 +25,7 @@ pipeline {
                     
                     docker login gitea.mjdev.dev -u ${GITEA_USERNAME} -p ${GITEA_PASSWORD}
                     docker build -f apps/server/Dockerfile.server -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                    
-                    # Retry push up to 3 times on failure
-                    retry(3) {
-                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
-                    }
+                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }

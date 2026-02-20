@@ -4,7 +4,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "ghcr.io/majeed4u/devjams-server"
+        IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-server"
         IMAGE_TAG = "${env.BUILD_ID}"
     }
 
@@ -17,10 +17,10 @@ pipeline {
 
         stage('Login and build image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ghcr_cred', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
+                withCredentials([usernamePassword(credentialsId: 'gitea_cred', passwordVariable: 'GITEA_TOKEN', usernameVariable: 'GITEA_USERNAME')]) {
                     sh """
-                    # Login to GHCR
-                    echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${GITHUB_USERNAME} --password-stdin
+                    # Login to Gitea
+                    echo ${GITEA_TOKEN} | docker login gitea.mjdev.dev -u ${GITEA_USERNAME} --password-stdin
                     
                     docker build -f apps/server/Dockerfile.server -t ${IMAGE_NAME}:${IMAGE_TAG} .
                     docker push ${IMAGE_NAME}:${IMAGE_TAG}

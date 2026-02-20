@@ -9,7 +9,6 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { Elysia } from "elysia";
-import { rateLimit } from "elysia-rate-limit";
 import { healthcheckPlugin } from "elysia-healthcheck";
 import { sentry } from "elysiajs-sentry";
 import logixlysia from "logixlysia";
@@ -35,16 +34,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 
 const app = new Elysia()
 
-  .use(
-    cors({
-      origin: [env.CORS_ORIGIN],
-      methods: ["GET", "POST", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    }),
-  )
   .use(healthcheckPlugin())
-  .use(rateLimit())
   .use(sentry())
   .use(
     logixlysia({
@@ -59,6 +49,14 @@ const app = new Elysia()
         customLogFormat:
           "🦊 {now} {level} {duration} {method} {pathname} {status} {message} {ip}",
       },
+    }),
+  )
+  .use(
+    cors({
+      origin: [env.CORS_ORIGIN],
+      methods: ["GET", "POST", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
     }),
   )
   .all("/api/auth/*", async (context) => {

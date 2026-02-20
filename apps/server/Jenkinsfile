@@ -56,17 +56,19 @@ pipeline {
                     git branch: 'main',
                         credentialsId: 'ghcr_cred',
                         url: 'https://github.com/majeed4u/devjams-k8s.git'
-                    sh '''
+                    sh """
                         git config --global user.email "jamodah20@gmail.com"
                         git config --global user.name "majeed4u"
-
-                        sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' server/values.yaml
-
-                        git add server/values.yaml
-                        git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
-                        git pull --rebase origin main || true
-                        git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devjams-k8s.git
-                    '''
+                    """
+                    retry(5) {
+                        sh """
+                            git pull --rebase origin main
+                            sed -i 's|^  tag:.*|  tag: "${IMAGE_TAG}"|' server/values.yaml
+                            git add server/values.yaml
+                            git commit -m "Updated server tag to '${IMAGE_TAG}' [ci skip]" || true
+                            git push https://\${GITHUB_USERNAME}:\${GITHUB_PASSWORD}@github.com/majeed4u/devjams-k8s.git
+                        """
+                    }
                 }
             }
         }

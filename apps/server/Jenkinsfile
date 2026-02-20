@@ -82,8 +82,7 @@ pipeline {
                         git config --global user.email "jamodah20@gmail.com"
                         git config --global user.name "majeed4u"
 
-                        sed -i 's|^ tag:.*| tag: "'"${IMAGE_TAG}"'"|' k8s/server/values.yaml
-                        sed -i '/^ tag: "[^"]*$/ s/$/"/' k8s/server/values.yaml
+                        sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' k8s/server/values.yaml
 
                         git add k8s/server/values.yaml
                         git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"

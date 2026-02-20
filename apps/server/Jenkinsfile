@@ -1,43 +1,47 @@
-
-
-
 pipeline {
     agent any
-
     environment {
         IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-server"
-        IMAGE_TAG = "${env.BUILD_ID}"
+        IMAGE_TAG  = "${env.BUILD_ID}"
     }
-
     stages {
-        stage('Self-trigger check') {
+
+        stage('Check commit message') {
             steps {
                 script {
-                    // examine commit messages to see if this build was started by our own tag update
-                    def skip = currentBuild.changeSets
-                        .collect { it.items }
-                        .flatten()
-                        .any { it.msg =~ /\[ci skip\]/ }
-                    if (skip) {
-                        echo 'Build triggered by self‑update commit ([ci skip]); aborting early.'
+                    // Get the latest commit message from git directly (more reliable than changeSets)
+                    def msg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+                    echo "Commit message: ${msg}"
+
+                    if (msg.contains('[ci skip]')) {
+                        echo 'Triggered by self-update commit ([ci skip]). Aborting.'
                         currentBuild.result = 'SUCCESS'
-                        // return from the pipeline script to stop further stages without failure
-                        return
+                        // This actually stops the pipeline in declarative syntax:
+                        error('[ci skip] detected — stopping pipeline intentionally.')
                     }
                 }
             }
         }
 
-        stage('Skip irrelevant paths') {
+        stage('Check relevant paths') {
             steps {
                 script {
-                    // only run backend pipeline when relevant files changed
-                    def changed = sh(script: 'git diff --name-only HEAD^ HEAD || true', returnStdout: true).trim()
-                    echo "Files changed:\n${changed}"
-                    if (!(changed =~ /^(apps\/server|packages\/api)\//)) {
-                        echo 'No backend-related files modified; skipping build.'
+                    def changed = sh(
+                        script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || git diff --name-only HEAD 2>/dev/null || echo "UNKNOWN"',
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Changed files:\n${changed}"
+
+                    // Check if ANY changed file is under the relevant paths
+                    def relevant = changed.split('\n').any { file ->
+                        file.startsWith('apps/server/') || file.startsWith('packages/api/')
+                    }
+
+                    if (!relevant) {
+                        echo 'No backend-related files changed. Skipping build.'
                         currentBuild.result = 'SUCCESS'
-                        error('Irrelevant change')
+                        error('No relevant changes — stopping pipeline intentionally.')
                     }
                 }
             }
@@ -45,19 +49,23 @@ pipeline {
 
         stage('Pull from Git') {
             steps {
-                git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
+                git branch: 'main',
+                    credentialsId: 'github_pat_cred',
+                    url: 'https://github.com/majeed4u/devsjam.git'
             }
         }
 
         stage('Login and build image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'gitea_cred', passwordVariable: 'GITEA_TOKEN', usernameVariable: 'GITEA_USERNAME')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'gitea_cred',
+                    passwordVariable: 'GITEA_TOKEN',
+                    usernameVariable: 'GITEA_USERNAME'
+                )]) {
                     sh """
-                    # Login to Gitea
-                    echo ${GITEA_TOKEN} | docker login gitea.mjdev.dev -u ${GITEA_USERNAME} --password-stdin
-                    
-                    docker build -f apps/server/Dockerfile.server -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        echo ${GITEA_TOKEN} | docker login gitea.mjdev.dev -u ${GITEA_USERNAME} --password-stdin
+                        docker build -f apps/server/Dockerfile.server -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }
@@ -65,31 +73,43 @@ pipeline {
 
         stage('Update Tag') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ghcr_cred', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                    git branch: 'main', credentialsId: 'ghcr_cred', url: 'https://github.com/majeed4u/devsjam.git'
-
+                withCredentials([usernamePassword(
+                    credentialsId: 'ghcr_cred',
+                    passwordVariable: 'GITHUB_PASSWORD',
+                    usernameVariable: 'GITHUB_USERNAME'
+                )]) {
+                    git branch: 'main',
+                        credentialsId: 'ghcr_cred',
+                        url: 'https://github.com/majeed4u/devsjam.git'
                     sh '''
-                    # Set git identity (required for commits)
-                    git config --global user.email "jamodah20@gmail.com"
-                    git config --global user.name "majeed4u"
+                        git config --global user.email "jamodah20@gmail.com"
+                        git config --global user.name "majeed4u"
 
-                    # Update the tag in the YAML file.  We'll simply rewrite the entire
-                    # `tag:` line which avoids any tricky escaping in the Jenkinsfile.
-                    sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' k8s/server/values.yaml
-                    # if somehow the closing quote is missing, append it
-                    sed -i '/^  tag: "[^"]*$/ s/$/"/' k8s/server/values.yaml
+                        sed -i 's|^ tag:.*| tag: "'"${IMAGE_TAG}"'"|' k8s/server/values.yaml
 
-                    # Add and commit if there are changes (include skip token to prevent webhook looping)
-                    git add k8s/server/values.yaml
-                    git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                        git add k8s/server/values.yaml
 
-                    # Push using credentials in URL
-                    git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
+                        # Only commit+push if there's actually a change
+                        if git diff --cached --quiet; then
+                            echo "No changes to commit."
+                        else
+                            git commit -m "Updated server tag to ${IMAGE_TAG} [ci skip]"
+                            git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
+                        fi
                     '''
                 }
             }
         }
+    }
 
-        
+    post {
+        failure {
+            script {
+                // Don't mark intentional skips as failures
+                if (currentBuild.result == 'SUCCESS') {
+                    echo 'Pipeline was intentionally stopped early — not a real failure.'
+                }
+            }
+        }
     }
 }

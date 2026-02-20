@@ -9,7 +9,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # This tag should be updated by CI/CD using --set image.tag=...
-  tag: "24"
+  tag: "28"
 
 imagePullSecrets:
   - name: regcred

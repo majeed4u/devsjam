@@ -8,6 +8,19 @@ pipeline {
 
     stages {
 
+        stage('Skip irrelevant changes') {
+            steps {
+                script {
+                    def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
+                    echo "Changed files:\n${changed}"
+                    if (!(changed =~ /^(apps\/web|packages\/api)/)) {
+                        echo 'No web-related files changed; skipping web build.'
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
+            }
+        }
 
         stage('Pull from Git') {
             steps {

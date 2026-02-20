@@ -8,54 +8,52 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Skip irrelevant changes') {
             steps {
-                checkout scm
+                script {
+                    def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
+                    echo "Changed files:\n${changed}"
+                    def lines = changed.split('\n')
+                    def relevant = lines.any { it.startsWith('apps/web/') || it.startsWith('packages/api/') }
+                    if (!relevant) {
+                        echo 'No web-related files changed; skipping web build.'
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
             }
         }
 
-        stage('Build Web') {
-            when {
-                anyOf {
-                    changeset "apps/web/**"
-                    changeset "packages/api/**"
-                }
-            }
+        stage('Pull from Git') {
             steps {
-                echo "Web-related changes detected. Building..."
+                git branch: 'main', credentialsId: 'github_pat_cred', url: 'https://github.com/majeed4u/devsjam.git'
+            }
+        }
 
-                withCredentials([usernamePassword(
-                    credentialsId: 'gitea_cred',
-                    passwordVariable: 'GITEA_TOKEN',
-                    usernameVariable: 'GITEA_USERNAME'
-                )]) {
+        stage('Login and build image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'gitea_cred', passwordVariable: 'GITEA_TOKEN', usernameVariable: 'GITEA_USERNAME')]) {
                     sh """
-                        echo ${GITEA_TOKEN} | docker login gitea.mjdev.dev -u ${GITEA_USERNAME} --password-stdin
-                        docker build -f apps/web/Dockerfile.web -t ${IMAGE_NAME}:${IMAGE_TAG} .
-                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                    # Login to Gitea
+                    echo ${GITEA_TOKEN} | docker login gitea.mjdev.dev -u ${GITEA_USERNAME} --password-stdin
+                    
+                    docker build -f apps/web/Dockerfile.web -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }
         }
 
-        stage('Update Web Tag') {
-            when {
-                anyOf {
-                    changeset "apps/web/**"
-                    changeset "packages/api/**"
-                }
-            }
+               stage('Update Tag') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr_cred',
                     passwordVariable: 'GITHUB_PASSWORD',
                     usernameVariable: 'GITHUB_USERNAME'
                 )]) {
-
                     git branch: 'main',
                         credentialsId: 'ghcr_cred',
                         url: 'https://github.com/majeed4u/devjams-k8s.git'
-
                     sh '''
                         git config --global user.email "jamodah20@gmail.com"
                         git config --global user.name "majeed4u"

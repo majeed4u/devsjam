@@ -1,30 +1,37 @@
 pipeline {
     agent any
-
     environment {
         IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-server"
         IMAGE_TAG  = "${env.BUILD_ID}"
     }
-
     stages {
 
-        stage('Checkout') {
+        stage('Skip irrelevant changes') {
             steps {
-                checkout scm
+                script {
+                    def changed = sh(script: 'git diff --name-only HEAD^ HEAD 2>/dev/null || true', returnStdout: true).trim()
+                    echo "Changed files:\n${changed}"
+                    def lines = changed.split('\n')
+                    def relevant = lines.any { it.startsWith('apps/server/') || it.startsWith('packages/api/') || it.startsWith('packages/db/') }
+                    if (!relevant) {
+                        echo 'No server-related files changed; skipping server build.'
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
             }
         }
 
-        stage('Build Server') {
-            when {
-                anyOf {
-                    changeset "apps/server/**"
-                    changeset "packages/api/**"
-                    changeset "packages/db/**"
-                }
-            }
+        stage('Pull from Git') {
             steps {
-                echo "Server-related changes detected. Building..."
+                git branch: 'main',
+                    credentialsId: 'github_pat_cred',
+                    url: 'https://github.com/majeed4u/devsjam.git'
+            }
+        }
 
+        stage('Login and build image') {
+            steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'gitea_cred',
                     passwordVariable: 'GITEA_TOKEN',
@@ -39,25 +46,16 @@ pipeline {
             }
         }
 
-        stage('Update Server Tag') {
-            when {
-                anyOf {
-                    changeset "apps/server/**"
-                    changeset "packages/api/**"
-                    changeset "packages/db/**"
-                }
-            }
+        stage('Update Tag') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr_cred',
                     passwordVariable: 'GITHUB_PASSWORD',
                     usernameVariable: 'GITHUB_USERNAME'
                 )]) {
-
                     git branch: 'main',
                         credentialsId: 'ghcr_cred',
                         url: 'https://github.com/majeed4u/devjams-k8s.git'
-
                     sh '''
                         git config --global user.email "jamodah20@gmail.com"
                         git config --global user.name "majeed4u"
@@ -65,7 +63,7 @@ pipeline {
                         sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' server/values.yaml
 
                         git add server/values.yaml
-                        git commit -m "Updated server tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                        git commit -m "Updated login tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
                         git pull --rebase origin main || true
                         git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devjams-k8s.git
                     '''

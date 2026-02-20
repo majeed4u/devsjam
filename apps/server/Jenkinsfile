@@ -4,7 +4,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "ghcr.io/YOUR_GITHUB_USERNAME/devjams-server"
+        IMAGE_NAME = "ghcr.io/majeed4u/devjams-server"
         IMAGE_TAG = "${env.BUILD_ID}"
     }
 
@@ -17,7 +17,7 @@ pipeline {
 
         stage('Login and build image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github_cred', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
+                withCredentials([usernamePassword(credentialsId: 'github_pat_cred', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
                     sh """
                     # Login to GHCR
                     echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${GITHUB_USERNAME} --password-stdin

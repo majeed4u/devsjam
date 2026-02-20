@@ -7,35 +7,7 @@ pipeline {
     }
 
     stages {
-        stage('Self-trigger check') {
-            steps {
-                script {
-                    def skip = currentBuild.changeSets
-                        .collect { it.items }
-                        .flatten()
-                        .any { it.msg =~ /\[ci skip\]/ }
-                    if (skip) {
-                        echo 'Build triggered by self‑update commit ([ci skip]); aborting early.'
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    }
-                }
-            }
-        }
 
-        stage('Skip irrelevant paths') {
-            steps {
-                script {
-                    def changed = sh(script: 'git diff --name-only HEAD^ HEAD || true', returnStdout: true).trim()
-                    echo "Files changed:\n${changed}"
-                    if (!(changed =~ /^(apps\/web)/)) {
-                        echo 'No frontend-related files modified; skipping build.'
-                        currentBuild.result = 'SUCCESS'
-                        error('Irrelevant change')
-                    }
-                }
-            }
-        }
 
         stage('Pull from Git') {
             steps {
@@ -57,27 +29,25 @@ pipeline {
             }
         }
 
-        stage('Update Tag') {
+               stage('Update Tag') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ghcr_cred', passwordVariable: 'GITHUB_PASSWORD', usernameVariable: 'GITHUB_USERNAME')]) {
-                    git branch: 'main', credentialsId: 'ghcr_cred', url: 'https://github.com/majeed4u/devsjam.git'
-
+                withCredentials([usernamePassword(
+                    credentialsId: 'ghcr_cred',
+                    passwordVariable: 'GITHUB_PASSWORD',
+                    usernameVariable: 'GITHUB_USERNAME'
+                )]) {
+                    git branch: 'main',
+                        credentialsId: 'ghcr_cred',
+                        url: 'https://github.com/majeed4u/devjams-k8s.git'
                     sh '''
-                    # Set git identity (required for commits)
-                    git config --global user.email "jamodah20@gmail.com"
-                    git config --global user.name "majeed4u"
+                        git config --global user.email "jamodah20@gmail.com"
+                        git config --global user.name "majeed4u"
 
-                    # Update the tag in the YAML file by replacing the whole line.
-                    sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' k8s/web/values.yaml
-                    # ensure trailing quote exists
-                    sed -i '/^  tag: "[^"]*$/ s/$/"/' k8s/web/values.yaml
+                        sed -i 's|^  tag:.*|  tag: "'"${IMAGE_TAG}"'"|' web/values.yaml
 
-                    # Add and commit if there are changes (include skip token to prevent webhook looping)
-                    git add k8s/web/values.yaml
-                    git commit -m "Updated web tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
-
-                    # Push using credentials in URL
-                    git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devsjam.git
+                        git add web/values.yaml
+                        git commit -m "Updated web tag to '${IMAGE_TAG}' [ci skip]" || echo "No changes to commit"
+                        git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/majeed4u/devjams-k8s.git
                     '''
                 }
             }

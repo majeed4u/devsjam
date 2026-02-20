@@ -48,6 +48,5 @@ coverage
 .cache
 tmp
 temp
-gitea-registry-secret.yaml
 k8s
-./k8sk8s/
+./k8s/

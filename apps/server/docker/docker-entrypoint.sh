@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-
-
 RETRIES=5
 SLEEP=2
 
@@ -25,16 +23,54 @@ echo "DB migration step (NODE_ENV=${NODE_ENV:-development}, RUN_MIGRATIONS=${RUN
 # Decide whether to run migrations (deploy) or db push
 if [ "${RUN_MIGRATIONS:-}" = "true" ] || [ "${NODE_ENV:-}" = "production" ]; then
   if [ -d packages/db/prisma/migrations ] && [ "$(ls -A packages/db/prisma/migrations)" ]; then
-    echo "Detected Prisma migrations — running 'prisma migrate deploy'"
-    if ! run_with_retries "cd packages/db && bunx prisma migrate deploy"; then
-      echo "prisma migrate deploy failed after ${RETRIES} attempts"
-      # In production we should fail; in non-production continue
-      if [ "${NODE_ENV:-}" = "production" ]; then
-        exit 1
+    echo "Detected Prisma migrations — checking status"
+    
+    # Check migration status first
+    cd packages/db
+    MIGRATE_STATUS=$(bunx prisma migrate status 2>&1 || true)
+    
+    if echo "$MIGRATE_STATUS" | grep -q "Database schema is up to date"; then
+      echo "✅ Database is already up to date, skipping migration"
+    elif echo "$MIGRATE_STATUS" | grep -q "P3005"; then
+      echo "⚠️  Database schema exists but migrations not tracked (P3005)"
+      echo "🔧 Baselining database with existing migrations..."
+      
+      # Get the first migration folder name
+      FIRST_MIGRATION=$(ls -1 prisma/migrations 2>/dev/null | head -1)
+      if [ -n "$FIRST_MIGRATION" ]; then
+        echo "Marking migration as applied: $FIRST_MIGRATION"
+        bunx prisma migrate resolve --applied "$FIRST_MIGRATION"
+        echo "✅ Database baselined successfully"
       else
-        echo "Continuing despite migration failure (non-production)"
+        echo "❌ No migrations found to baseline"
+        if [ "${NODE_ENV:-}" = "production" ]; then
+          exit 1
+        fi
+      fi
+    elif echo "$MIGRATE_STATUS" | grep -q "not yet been applied"; then
+      echo "📦 Pending migrations detected, applying..."
+      if ! run_with_retries "bunx prisma migrate deploy"; then
+        echo "prisma migrate deploy failed after ${RETRIES} attempts"
+        if [ "${NODE_ENV:-}" = "production" ]; then
+          exit 1
+        else
+          echo "Continuing despite migration failure (non-production)"
+        fi
+      else
+        echo "✅ Migrations applied successfully"
+      fi
+    else
+      echo "🚀 Running 'prisma migrate deploy'"
+      if ! run_with_retries "bunx prisma migrate deploy"; then
+        echo "prisma migrate deploy failed after ${RETRIES} attempts"
+        if [ "${NODE_ENV:-}" = "production" ]; then
+          exit 1
+        else
+          echo "Continuing despite migration failure (non-production)"
+        fi
       fi
     fi
+    cd /app
   else
     echo "No Prisma migrations found; skipping 'prisma migrate deploy'"
   fi

@@ -11,6 +11,7 @@ services:
       - DATABASE_URL=postgresql://postgres:majed@123@192.168.3.31:5432/devjams_stg
       - BETTER_AUTH_URL=https://devjams-stg-api.local.majedtec.com
       - BETTER_AUTH_SECRET=OHgRyAzg67dRcuEf4lHuRhiV8AzgvQ7C
+      - SENTRY_DSN="https://9a44b7b461853ab3fb5c0057bf80a6dc@o4509995129110528.ingest.de.sentry.io/4510914968027216"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.devjams-server.rule=Host(`devjams-stg-api.local.majedtec.com`)"

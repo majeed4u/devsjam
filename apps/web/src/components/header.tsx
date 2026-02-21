@@ -2,8 +2,12 @@ import { Link } from "@tanstack/react-router";
 
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@/utils/orpc";
+import { Lightbulb, LightbulbOff } from "lucide-react";
 
 export default function Header() {
+  const healthCheck = useQuery(orpc.healthCheck.queryOptions());
   const links = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
@@ -22,6 +26,13 @@ export default function Header() {
           })}
         </nav>
         <div className="flex items-center gap-2">
+          <div>
+            {healthCheck.data ? (
+              <Lightbulb className=" text-secondary size-4" />
+            ) : (
+              <LightbulbOff className=" text-primary size-4" />
+            )}
+          </div>
           <ModeToggle />
           <UserMenu />
         </div>

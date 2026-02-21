@@ -50,3 +50,4 @@ tmp
 temp
 k8s
 ./k8s/
+compose.yaml

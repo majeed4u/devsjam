@@ -1,0 +1,27 @@
+///////////////////////////
+// TAG (Many-to-Many)
+///////////////////////////
+
+model Tag {
+    id   String @id @default(cuid())
+    name String
+    slug String @unique
+
+    posts PostTag[]
+
+    createdAt DateTime @default(now())
+}
+
+///////////////////////////
+// POST TAGS (Many-to-Many)
+///////////////////////////
+
+model PostTag {
+    postId String
+    tagId  String
+
+    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@id([postId, tagId])
+}

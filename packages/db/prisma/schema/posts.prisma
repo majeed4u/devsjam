@@ -1,0 +1,37 @@
+///////////////////////////
+// BLOG CORE
+///////////////////////////
+
+model Post {
+    id          String  @id @default(cuid())
+    title       String
+    slug        String  @unique
+    excerpt     String?
+    content     String // Markdown or MDX
+    coverImage  String?
+    published   Boolean @default(false)
+    readingTime Int? // in minutes
+    views       Int     @default(0)
+
+    authorId String
+    author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+    categoryId String?
+    category   Category? @relation(fields: [categoryId], references: [id])
+
+    seriesId    String?
+    series      Series? @relation(fields: [seriesId], references: [id])
+    seriesOrder Int? // order inside series
+
+    tags PostTag[]
+
+    comments Comment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([slug])
+    @@index([published])
+    @@index([createdAt])
+    @@index([seriesId, seriesOrder])
+}

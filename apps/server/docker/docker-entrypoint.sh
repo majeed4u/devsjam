@@ -36,7 +36,7 @@ if [ "${RUN_MIGRATIONS:-}" = "true" ] || [ "${NODE_ENV:-}" = "production" ]; the
       echo "🔧 Baselining database with existing migrations..."
       
       # Get the first migration folder name
-      FIRST_MIGRATION=$(ls -1 prisma/migrations 2>/dev/null | head -1)
+      FIRST_MIGRATION=$(ls -1 prisma/migrations 2>/dev/null | grep -v '\.toml$' | head -1)
       if [ -n "$FIRST_MIGRATION" ]; then
         echo "Marking migration as applied: $FIRST_MIGRATION"
         bunx prisma migrate resolve --applied "$FIRST_MIGRATION"
@@ -49,12 +49,26 @@ if [ "${RUN_MIGRATIONS:-}" = "true" ] || [ "${NODE_ENV:-}" = "production" ]; the
       fi
     elif echo "$MIGRATE_STATUS" | grep -q "not yet been applied"; then
       echo "📦 Pending migrations detected, applying..."
-      if ! run_with_retries "bunx prisma migrate deploy"; then
-        echo "prisma migrate deploy failed after ${RETRIES} attempts"
-        if [ "${NODE_ENV:-}" = "production" ]; then
-          exit 1
+      set +e
+      DEPLOY_OUTPUT=$(bunx prisma migrate deploy 2>&1)
+      DEPLOY_EXIT=$?
+      set -e
+      echo "$DEPLOY_OUTPUT"
+      if [ $DEPLOY_EXIT -ne 0 ]; then
+        if echo "$DEPLOY_OUTPUT" | grep -q "P3005"; then
+          echo "⚠️  P3005: schema exists but not tracked — baselining all migrations..."
+          for MIGRATION in $(ls -1 prisma/migrations 2>/dev/null | grep -v '\.toml$'); do
+            echo "Marking as applied: $MIGRATION"
+            bunx prisma migrate resolve --applied "$MIGRATION"
+          done
+          echo "✅ All migrations baselined successfully"
         else
-          echo "Continuing despite migration failure (non-production)"
+          echo "prisma migrate deploy failed"
+          if [ "${NODE_ENV:-}" = "production" ]; then
+            exit 1
+          else
+            echo "Continuing despite migration failure (non-production)"
+          fi
         fi
       else
         echo "✅ Migrations applied successfully"

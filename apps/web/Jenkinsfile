@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "gitea.mjdev.dev/gitadmin/registery/devjams-web"
-        IMAGE_TAG = "${env.BUILD_ID}"
+        IMAGE_TAG  = sh(script: 'git rev-list --count HEAD', returnStdout: true).trim()
     }
 
     stages {

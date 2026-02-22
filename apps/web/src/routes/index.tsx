@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { orpc } from "@/utils/orpc";
 import { MintlifyBackground } from "@/components/MintlifyBackground";
+import { PostView } from "@/components/PostView";
+import type { Post } from "../../../../packages/db/prisma/generated/client";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -10,12 +12,16 @@ export const Route = createFileRoute("/")({
 
 function HomeComponent() {
   const healthCheck = useQuery(orpc.healthCheck.queryOptions());
+  const { data: posts } = useQuery(orpc.posts.getPosts.queryOptions());
 
   return (
-    <div className="relative  overflow-x-hidden">
-      <MintlifyBackground />
-
+    <div className=" mx-auto">
       <h1>DevJams Blog</h1>
+      <div className="space-y-12">
+        {posts?.map((post) => (
+          <PostView key={post.id} post={post as any} />
+        ))}
+      </div>
     </div>
   );
 }

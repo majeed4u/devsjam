@@ -13,7 +13,6 @@ import { healthcheckPlugin } from "elysia-healthcheck";
 import { sentry } from "elysiajs-sentry";
 import { serverTiming } from "@elysiajs/server-timing";
 
-import logixlysia from "logixlysia";
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
     onError((error) => {

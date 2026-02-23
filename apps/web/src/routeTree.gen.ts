@@ -10,17 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminPostIndexRouteImport } from './routes/admin/post/index'
+import { Route as AdminAnalyticsIndexRouteImport } from './routes/admin/analytics/index'
+import { Route as AdminPostPublishedIndexRouteImport } from './routes/admin/post/published/index'
+import { Route as AdminPostNewIndexRouteImport } from './routes/admin/post/new/index'
+import { Route as AdminPostArchivedIndexRouteImport } from './routes/admin/post/archived/index'
+import { Route as AdminPostPostIdEditIndexRouteImport } from './routes/admin/post/$postId/edit/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,34 +34,111 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPostIndexRoute = AdminPostIndexRouteImport.update({
+  id: '/post/',
+  path: '/post/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminAnalyticsIndexRoute = AdminAnalyticsIndexRouteImport.update({
+  id: '/analytics/',
+  path: '/analytics/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPostPublishedIndexRoute = AdminPostPublishedIndexRouteImport.update({
+  id: '/post/published/',
+  path: '/post/published/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPostNewIndexRoute = AdminPostNewIndexRouteImport.update({
+  id: '/post/new/',
+  path: '/post/new/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPostArchivedIndexRoute = AdminPostArchivedIndexRouteImport.update({
+  id: '/post/archived/',
+  path: '/post/archived/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminPostPostIdEditIndexRoute =
+  AdminPostPostIdEditIndexRouteImport.update({
+    id: '/post/$postId/edit/',
+    path: '/post/$postId/edit/',
+    getParentRoute: () => AdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/analytics/': typeof AdminAnalyticsIndexRoute
+  '/admin/post/': typeof AdminPostIndexRoute
+  '/admin/post/archived/': typeof AdminPostArchivedIndexRoute
+  '/admin/post/new/': typeof AdminPostNewIndexRoute
+  '/admin/post/published/': typeof AdminPostPublishedIndexRoute
+  '/admin/post/$postId/edit/': typeof AdminPostPostIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/analytics': typeof AdminAnalyticsIndexRoute
+  '/admin/post': typeof AdminPostIndexRoute
+  '/admin/post/archived': typeof AdminPostArchivedIndexRoute
+  '/admin/post/new': typeof AdminPostNewIndexRoute
+  '/admin/post/published': typeof AdminPostPublishedIndexRoute
+  '/admin/post/$postId/edit': typeof AdminPostPostIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/analytics/': typeof AdminAnalyticsIndexRoute
+  '/admin/post/': typeof AdminPostIndexRoute
+  '/admin/post/archived/': typeof AdminPostArchivedIndexRoute
+  '/admin/post/new/': typeof AdminPostNewIndexRoute
+  '/admin/post/published/': typeof AdminPostPublishedIndexRoute
+  '/admin/post/$postId/edit/': typeof AdminPostPostIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/admin/analytics/'
+    | '/admin/post/'
+    | '/admin/post/archived/'
+    | '/admin/post/new/'
+    | '/admin/post/published/'
+    | '/admin/post/$postId/edit/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login'
-  id: '__root__' | '/' | '/dashboard' | '/login'
+  to:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/admin/analytics'
+    | '/admin/post'
+    | '/admin/post/archived'
+    | '/admin/post/new'
+    | '/admin/post/published'
+    | '/admin/post/$postId/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/admin/analytics/'
+    | '/admin/post/'
+    | '/admin/post/archived/'
+    | '/admin/post/new/'
+    | '/admin/post/published/'
+    | '/admin/post/$postId/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -68,11 +151,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -82,12 +165,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/post/': {
+      id: '/admin/post/'
+      path: '/post'
+      fullPath: '/admin/post/'
+      preLoaderRoute: typeof AdminPostIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/analytics/': {
+      id: '/admin/analytics/'
+      path: '/analytics'
+      fullPath: '/admin/analytics/'
+      preLoaderRoute: typeof AdminAnalyticsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/post/published/': {
+      id: '/admin/post/published/'
+      path: '/post/published'
+      fullPath: '/admin/post/published/'
+      preLoaderRoute: typeof AdminPostPublishedIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/post/new/': {
+      id: '/admin/post/new/'
+      path: '/post/new'
+      fullPath: '/admin/post/new/'
+      preLoaderRoute: typeof AdminPostNewIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/post/archived/': {
+      id: '/admin/post/archived/'
+      path: '/post/archived'
+      fullPath: '/admin/post/archived/'
+      preLoaderRoute: typeof AdminPostArchivedIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/post/$postId/edit/': {
+      id: '/admin/post/$postId/edit/'
+      path: '/post/$postId/edit'
+      fullPath: '/admin/post/$postId/edit/'
+      preLoaderRoute: typeof AdminPostPostIdEditIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminAnalyticsIndexRoute: typeof AdminAnalyticsIndexRoute
+  AdminPostIndexRoute: typeof AdminPostIndexRoute
+  AdminPostArchivedIndexRoute: typeof AdminPostArchivedIndexRoute
+  AdminPostNewIndexRoute: typeof AdminPostNewIndexRoute
+  AdminPostPublishedIndexRoute: typeof AdminPostPublishedIndexRoute
+  AdminPostPostIdEditIndexRoute: typeof AdminPostPostIdEditIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAnalyticsIndexRoute: AdminAnalyticsIndexRoute,
+  AdminPostIndexRoute: AdminPostIndexRoute,
+  AdminPostArchivedIndexRoute: AdminPostArchivedIndexRoute,
+  AdminPostNewIndexRoute: AdminPostNewIndexRoute,
+  AdminPostPublishedIndexRoute: AdminPostPublishedIndexRoute,
+  AdminPostPostIdEditIndexRoute: AdminPostPostIdEditIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport

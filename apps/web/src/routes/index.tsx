@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-
 import { orpc } from "@/utils/orpc";
-import { MintlifyBackground } from "@/components/MintlifyBackground";
 import { PostView } from "@/components/PostView";
-import type { Post } from "../../../../packages/db/prisma/generated/client";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,

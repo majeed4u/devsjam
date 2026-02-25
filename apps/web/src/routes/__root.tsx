@@ -1,6 +1,5 @@
 import type { AppRouterClient } from "@devjams/api/routers/index";
 import type { QueryClient } from "@tanstack/react-query";
-
 import { createORPCClient } from "@orpc/client";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

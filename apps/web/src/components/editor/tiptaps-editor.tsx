@@ -101,7 +101,7 @@ export const TipTapsEditor = ({
     editorProps: {
       attributes: {
         class:
-          "min-h-56 prose prose-sm sm:prose lg:prose-lg xl:prose-xl 2xl:prose-2xl mx-auto focus:outline-none  p-4 rounded-sm",
+          "min-h-56 prose prose-invert focus:outline-none  px-2 py-1 rounded-sm text-white",
       },
     },
   });
@@ -141,7 +141,7 @@ export const TipTapsEditor = ({
 
   return (
     <div className="h-full">
-      <div className=" py-2  rounded-md space-y-1">
+      <div className=" py-2 rounded-md space-y-1 ">
         <EditorMenubar editor={editor} />
         <EditorContent className=" border rounded-b-md" editor={editor} />
         <div

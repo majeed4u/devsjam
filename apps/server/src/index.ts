@@ -12,6 +12,9 @@ import { Elysia } from "elysia";
 import { healthcheckPlugin } from "elysia-healthcheck";
 import { sentry } from "elysiajs-sentry";
 import { serverTiming } from "@elysiajs/server-timing";
+import { openapi } from "@elysiajs/openapi";
+import { getFile } from "@devjams/api/lib/s3-helper";
+import { logger } from "@chneau/elysia-logger";
 
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
@@ -34,25 +37,11 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 });
 
 const app = new Elysia()
+  .use(openapi())
   .use(serverTiming())
 
   .use(healthcheckPlugin())
   .use(sentry())
-  // .use(
-  //   logixlysia({
-  //     config: {
-  //       showStartupMessage: true,
-  //       startupMessageFormat: "simple",
-  //       timestamp: {
-  //         translateTime: "yyyy-mm-dd HH:MM:ss.SSS",
-  //       },
-  //       logFilePath: "./logs/example.log",
-  //       ip: true,
-  //       customLogFormat:
-  //         "🦊 {now} {level} {duration} {method} {pathname} {status} {message} {ip}",
-  //     },
-  //   }),
-  // )
   .use(
     cors({
       origin: [env.CORS_ORIGIN],
@@ -82,11 +71,25 @@ const app = new Elysia()
     });
     return response ?? new Response("Not Found", { status: 404 });
   })
-  .get("/", () => "OK - DevJams - Server");
-app.listen(
-  {
-    port: 3000,
-    hostname: "0.0.0.0",
-  },
-  () => console.log("server running on http://0.0.0.0:3000"),
-);
+  .get("/media/*", async ({ params, status }) => {
+    try {
+      const { buffer, contentType } = await getFile(params["*"]);
+      return new Response(buffer, {
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=31536000, immutable",
+        },
+      });
+    } catch {
+      return status(404);
+    }
+  })
+  .get("/", () => "OK - DevJams - Server")
+  .use(logger())
+  .listen(
+    {
+      port: 3000,
+      hostname: "0.0.0.0",
+    },
+    () => console.log("server running on http://0.0.0.0:3000"),
+  );

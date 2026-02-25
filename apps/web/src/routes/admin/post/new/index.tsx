@@ -1,3 +1,4 @@
+import { NewPostForm } from "@/components/post/new-post-form";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/post/new/")({
@@ -5,5 +6,5 @@ export const Route = createFileRoute("/admin/post/new/")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/admin/post/new/"!</div>;
+  return <NewPostForm />;
 }

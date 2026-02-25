@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 
 function HomeComponent() {
   const healthCheck = useQuery(orpc.healthCheck.queryOptions());
-  const { data: posts } = useQuery(orpc.posts.getPosts.queryOptions());
+  const { data: posts } = useQuery(orpc.post.getPosts.queryOptions());
 
   return (
     <div className=" mx-auto">

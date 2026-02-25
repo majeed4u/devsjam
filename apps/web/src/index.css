@@ -205,3 +205,86 @@
     @apply font-sans;
   }
 }
+
+/* Light mode - dark text */
+.tiptap.ProseMirror {
+  color: rgb(17 24 39); /* gray-900 */
+}
+
+.tiptap.ProseMirror h1,
+.tiptap.ProseMirror h2,
+.tiptap.ProseMirror h3,
+.tiptap.ProseMirror h4,
+.tiptap.ProseMirror h5,
+.tiptap.ProseMirror h6,
+.tiptap.ProseMirror strong {
+  color: rgb(17 24 39);
+}
+
+.tiptap.ProseMirror p,
+.tiptap.ProseMirror li {
+  color: rgb(55 65 81); /* gray-700 */
+}
+
+.tiptap.ProseMirror blockquote {
+  color: rgb(107 114 128); /* gray-500 */
+  border-left-color: rgb(209 213 219); /* gray-300 */
+}
+
+.tiptap.ProseMirror code {
+  color: rgb(31 41 55);
+  background-color: rgb(243 244 246); /* gray-100 */
+}
+
+.tiptap.ProseMirror pre {
+  background-color: rgb(243 244 246);
+  color: rgb(31 41 55);
+}
+
+.tiptap.ProseMirror a {
+  color: rgb(37 99 235); /* blue-600 */
+}
+
+/* Dark mode - light text */
+.dark .tiptap.ProseMirror {
+  color: white;
+}
+
+.dark .tiptap.ProseMirror h1,
+.dark .tiptap.ProseMirror h2,
+.dark .tiptap.ProseMirror h3,
+.dark .tiptap.ProseMirror h4,
+.dark .tiptap.ProseMirror h5,
+.dark .tiptap.ProseMirror h6,
+.dark .tiptap.ProseMirror strong {
+  color: white;
+}
+
+.dark .tiptap.ProseMirror p,
+.dark .tiptap.ProseMirror li {
+  color: rgb(229 231 235); /* gray-200 */
+}
+
+.dark .tiptap.ProseMirror blockquote {
+  color: rgb(156 163 175); /* gray-400 */
+  border-left-color: rgb(75 85 99); /* gray-600 */
+}
+
+.dark .tiptap.ProseMirror code {
+  color: rgb(209 213 219);
+  background-color: rgb(31 41 55); /* gray-800 */
+}
+
+.dark .tiptap.ProseMirror pre {
+  background-color: rgb(17 24 39); /* gray-900 */
+  color: rgb(229 231 235);
+}
+
+.dark .tiptap.ProseMirror a {
+  color: rgb(96 165 250); /* blue-400 */
+}
+
+/* Override Tailwind prose :where() specificity */
+.prose :where(h1, h2, h3, h4):not(:where([class~="not-prose"] *)) {
+  color: inherit;
+}

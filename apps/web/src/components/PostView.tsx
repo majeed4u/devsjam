@@ -8,20 +8,31 @@ export const PostView = ({ post }: { post: Post }) => {
   useEffect(() => {
     async function highlight() {
       const highlighter = await createHighlighter({
-        themes: ["nord"],
+        themes: ["material-theme-darker"],
         langs: ["ts", "js", "tsx", "jsx", "yaml", "sh", "html", "bash"],
       });
 
-      const highlighted = post.content.replace(
-        /<pre><code class="language-(.*?)">(.*?)<\/code><\/pre>/gs,
+      // Merge consecutive <p><code>...</code></p> lines into a single <pre><code> block
+      const merged = post.content.replace(
+        /(<p><code>[^<]*<\/code><\/p>\s*)+/g,
+        (match) => {
+          const lines = [
+            ...match.matchAll(/<p><code>(.*?)<\/code><\/p>/gs),
+          ].map(([, line]) => line);
+          return `<pre><code>${lines.join("\n")}</code></pre>`;
+        },
+      );
+
+      const highlighted = merged.replace(
+        /<pre><code(?:\s+class="language-([\w-]+)")?>(.*?)<\/code><\/pre>/gs,
         (_, lang, code) => {
           const decoded = code
             .replace(/&lt;/g, "<")
             .replace(/&gt;/g, ">")
             .replace(/&amp;/g, "&");
           return highlighter.codeToHtml(decoded, {
-            lang,
-            theme: "nord",
+            lang: lang || "text",
+            theme: "material-theme-darker",
           });
         },
       );

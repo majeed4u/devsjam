@@ -6,6 +6,7 @@ import {
   Underline as UnderlineIcn,
   Strikethrough,
   Code,
+  SquareCode,
   Highlighter,
   AlignLeft,
   AlignCenter,
@@ -34,6 +35,7 @@ export const EditorMenubar = ({ editor }: { editor: Editor | null }) => {
       underline: editor?.isActive("underline") ?? false,
       strike: editor?.isActive("strike") ?? false,
       code: editor?.isActive("code") ?? false,
+      codeBlock: editor?.isActive("codeBlock") ?? false,
       highlight: editor?.isActive("highlight") ?? false,
 
       h1: editor?.isActive("heading", { level: 1 }) ?? false,
@@ -116,7 +118,13 @@ export const EditorMenubar = ({ editor }: { editor: Editor | null }) => {
       key: "code",
       icon: Code,
       action: () => editor.chain().focus().toggleCode().run(),
-      title: "Code",
+      title: "Inline Code",
+    },
+    {
+      key: "codeBlock",
+      icon: SquareCode,
+      action: () => editor.chain().focus().toggleCodeBlock().run(),
+      title: "Code Block",
     },
     {
       key: "highlight",

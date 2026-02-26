@@ -8,12 +8,10 @@ interface BlogLayoutProps {
 
 export function BlogLayout({ children }: BlogLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex flex-col min-h-screen">
-        <PublicHeader />
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      <PublicHeader />
+      <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 }

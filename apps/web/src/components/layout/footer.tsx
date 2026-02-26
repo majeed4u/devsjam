@@ -1,17 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Github, Twitter, Linkedin, Rss, Heart } from "lucide-react";
+import { Github, Twitter, Linkedin, Rss, Terminal } from "lucide-react";
 
-const footerLinks = {
-  main: [
-    { name: "Home", to: "/" as const },
-    { name: "Blog", to: "/" as const },
-    { name: "About", to: "/" as const },
-  ],
-  resources: [
-    { name: "Projects", to: "/" as const },
-    { name: "Contact", to: "/" as const },
-  ],
-};
+const footerLinks = [
+  { name: "Home", to: "/" as const },
+  { name: "Blog", to: "/" as const },
+  { name: "About", to: "/" as const },
+  { name: "Projects", to: "/" as const },
+];
 
 const socialLinks = [
   {
@@ -38,65 +33,71 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/30">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="py-12">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+    <footer className="border-t border-border">
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="py-16">
+          <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
             {/* Brand */}
-            <div className="space-y-4">
-              <Link to="/" className="inline-block">
-                <span className="text-xl font-bold tracking-tight text-foreground">
+            <div className="flex flex-col gap-4 max-w-sm">
+              <Link to="/" className="flex items-center gap-2.5 group">
+                <div className="flex items-center justify-center w-8 h-8 rounded-md bg-foreground">
+                  <Terminal className="h-4 w-4 text-background" />
+                </div>
+                <span className="text-lg font-sans font-semibold tracking-tight text-foreground">
                   DevJams
                 </span>
               </Link>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                A personal blog where I share my experiences, learnings, and
-                thoughts on software development and technology.
+                Thoughts on software development, technology, and the craft of
+                building things for the web.
               </p>
             </div>
 
-            {/* Main Links */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-4">
-                Navigation
-              </h3>
-              <ul className="space-y-3">
-                {footerLinks.main.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.to}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Resources & Social */}
-            <div className="space-y-4">
+            {/* Links & Social */}
+            <div className="flex gap-16">
+              {/* Navigation */}
               <div>
-                <h3 className="text-sm font-semibold text-foreground mb-4">
+                <h3 className="text-xs font-sans font-semibold uppercase tracking-widest text-muted-foreground mb-4">
+                  Navigate
+                </h3>
+                <ul className="flex flex-col gap-2.5">
+                  {footerLinks.map((link) => (
+                    <li key={link.name}>
+                      <Link
+                        to={link.to}
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Social */}
+              <div>
+                <h3 className="text-xs font-sans font-semibold uppercase tracking-widest text-muted-foreground mb-4">
                   Connect
                 </h3>
-                <div className="flex space-x-4">
+                <ul className="flex flex-col gap-2.5">
                   {socialLinks.map((social) => {
                     const Icon = social.icon;
                     return (
-                      <a
-                        key={social.name}
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground transition-colors hover:text-foreground"
-                        aria-label={social.name}
-                      >
-                        <Icon className="h-5 w-5" />
-                      </a>
+                      <li key={social.name}>
+                        <a
+                          href={social.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                          aria-label={social.name}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{social.name}</span>
+                        </a>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               </div>
             </div>
           </div>
@@ -104,12 +105,8 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-border py-6">
-          <p className="text-center text-sm text-muted-foreground">
-            Built with <Heart className="inline h-4 w-4 text-red-500" /> by{" "}
-            <Link to="/" className="text-foreground hover:text-primary">
-              DevJams
-            </Link>
-            . &copy; {new Date().getFullYear()}
+          <p className="text-xs text-muted-foreground text-center">
+            &copy; {new Date().getFullYear()} DevJams. Built with care.
           </p>
         </div>
       </div>

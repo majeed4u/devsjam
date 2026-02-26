@@ -13,6 +13,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Stub workspace packages for standalone dev server
+      "@devjams/api/routers/index": path.resolve(__dirname, "./src/stubs/api-routers.ts"),
+      "@devjams/api": path.resolve(__dirname, "./src/stubs/api-routers.ts"),
     },
   },
   server: {

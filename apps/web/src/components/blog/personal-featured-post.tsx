@@ -1,7 +1,7 @@
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import type { Post } from "../../../../packages/db/prisma/generated/client";
+import type { Post } from "@/types/post";
 
 interface PersonalFeaturedPostProps {
   post: Post;

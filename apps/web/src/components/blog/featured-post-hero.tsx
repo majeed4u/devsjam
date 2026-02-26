@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Post } from "../../../../packages/db/prisma/generated/client";
+import type { Post } from "@/types/post";
 
 interface FeaturedPostHeroProps {
   post: Post;

@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import type { Post } from "../../../../packages/db/prisma/generated/client";
+import type { Post } from "@/types/post";
 
 interface PostGridProps {
   posts: Post[];

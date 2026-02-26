@@ -1,4 +1,5 @@
-import { AdminLayout } from "@/components/admin/admin-layout";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin")({
@@ -7,8 +8,11 @@ export const Route = createFileRoute("/admin")({
 
 function AdminDashboard() {
   return (
-    <AdminLayout>
-      <Outlet />
-    </AdminLayout>
+    <SidebarProvider>
+      <AppSidebar />
+      <main className="w-full p-4">
+        <Outlet />
+      </main>
+    </SidebarProvider>
   );
 }

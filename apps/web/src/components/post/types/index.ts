@@ -21,7 +21,7 @@ export const postCreateSchema = z
 
 export type PostCreateInput = z.infer<typeof postCreateSchema>;
 
-export type PostCardType = {
+export type PostTypeAll = {
   tags: {
     id: string;
     name: string;

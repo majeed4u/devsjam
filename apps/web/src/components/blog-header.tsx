@@ -27,7 +27,7 @@ export function BlogHeader() {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? "border-border/40 border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60"
+          ? "border-border/40 border-b bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60"
           : "border-transparent border-b bg-background/50"
       }`}
     >

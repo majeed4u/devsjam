@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, Clock, Tag } from "lucide-react";
 import type { Post } from "@/types/post";
-import type { PostCardType } from "./types";
+import type { PostTypeAll } from "./types";
 
 interface PostCardProps {
-  post: PostCardType;
+  post: PostTypeAll;
 }
 
 export function PostCard({ post }: PostCardProps) {

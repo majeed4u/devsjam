@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminDashboardComponent() {
 	const { data: posts, isLoading } = useQuery(
-		orpc.post.getPosts.queryOptions(),
+		orpc.post.getPostsForAdmin.queryOptions(),
 	);
 
 	return (

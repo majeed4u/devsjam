@@ -6,7 +6,7 @@ import type { Post } from "@/types/post";
 
 export function DashboardStats() {
   const { data: posts, isLoading } = useQuery(
-    orpc.post.getPosts.queryOptions(),
+    orpc.post.getPostsForAdmin.queryOptions(),
   );
 
   if (isLoading) {

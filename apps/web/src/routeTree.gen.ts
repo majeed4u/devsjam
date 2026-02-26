@@ -19,6 +19,7 @@ import { Route as BlogSlugIndexRouteImport } from './routes/blog/$slug/index'
 import { Route as AdminPostIndexRouteImport } from './routes/admin/post/index'
 import { Route as AdminAnalyticsIndexRouteImport } from './routes/admin/analytics/index'
 import { Route as BlogTagTagIndexRouteImport } from './routes/blog/tag/$tag/index'
+import { Route as BlogSeriesSeriesIndexRouteImport } from './routes/blog/series/$series/index'
 import { Route as BlogCategoryCategoryIndexRouteImport } from './routes/blog/category/$category/index'
 import { Route as AdminPostPublishedIndexRouteImport } from './routes/admin/post/published/index'
 import { Route as AdminPostNewIndexRouteImport } from './routes/admin/post/new/index'
@@ -75,6 +76,11 @@ const BlogTagTagIndexRoute = BlogTagTagIndexRouteImport.update({
   path: '/blog/tag/$tag/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogSeriesSeriesIndexRoute = BlogSeriesSeriesIndexRouteImport.update({
+  id: '/blog/series/$series/',
+  path: '/blog/series/$series/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogCategoryCategoryIndexRoute =
   BlogCategoryCategoryIndexRouteImport.update({
     id: '/blog/category/$category/',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/admin/post/new/': typeof AdminPostNewIndexRoute
   '/admin/post/published/': typeof AdminPostPublishedIndexRoute
   '/blog/category/$category/': typeof BlogCategoryCategoryIndexRoute
+  '/blog/series/$series/': typeof BlogSeriesSeriesIndexRoute
   '/blog/tag/$tag/': typeof BlogTagTagIndexRoute
   '/admin/post/$postId/edit/': typeof AdminPostPostIdEditIndexRoute
 }
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/admin/post/new': typeof AdminPostNewIndexRoute
   '/admin/post/published': typeof AdminPostPublishedIndexRoute
   '/blog/category/$category': typeof BlogCategoryCategoryIndexRoute
+  '/blog/series/$series': typeof BlogSeriesSeriesIndexRoute
   '/blog/tag/$tag': typeof BlogTagTagIndexRoute
   '/admin/post/$postId/edit': typeof AdminPostPostIdEditIndexRoute
 }
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/admin/post/new/': typeof AdminPostNewIndexRoute
   '/admin/post/published/': typeof AdminPostPublishedIndexRoute
   '/blog/category/$category/': typeof BlogCategoryCategoryIndexRoute
+  '/blog/series/$series/': typeof BlogSeriesSeriesIndexRoute
   '/blog/tag/$tag/': typeof BlogTagTagIndexRoute
   '/admin/post/$postId/edit/': typeof AdminPostPostIdEditIndexRoute
 }
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin/post/new/'
     | '/admin/post/published/'
     | '/blog/category/$category/'
+    | '/blog/series/$series/'
     | '/blog/tag/$tag/'
     | '/admin/post/$postId/edit/'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin/post/new'
     | '/admin/post/published'
     | '/blog/category/$category'
+    | '/blog/series/$series'
     | '/blog/tag/$tag'
     | '/admin/post/$postId/edit'
   id:
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/admin/post/new/'
     | '/admin/post/published/'
     | '/blog/category/$category/'
+    | '/blog/series/$series/'
     | '/blog/tag/$tag/'
     | '/admin/post/$postId/edit/'
   fileRoutesById: FileRoutesById
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   BlogSlugIndexRoute: typeof BlogSlugIndexRoute
   BlogCategoryCategoryIndexRoute: typeof BlogCategoryCategoryIndexRoute
+  BlogSeriesSeriesIndexRoute: typeof BlogSeriesSeriesIndexRoute
   BlogTagTagIndexRoute: typeof BlogTagTagIndexRoute
 }
 
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogTagTagIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/series/$series/': {
+      id: '/blog/series/$series/'
+      path: '/blog/series/$series'
+      fullPath: '/blog/series/$series/'
+      preLoaderRoute: typeof BlogSeriesSeriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/category/$category/': {
       id: '/blog/category/$category/'
       path: '/blog/category/$category'
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   BlogSlugIndexRoute: BlogSlugIndexRoute,
   BlogCategoryCategoryIndexRoute: BlogCategoryCategoryIndexRoute,
+  BlogSeriesSeriesIndexRoute: BlogSeriesSeriesIndexRoute,
   BlogTagTagIndexRoute: BlogTagTagIndexRoute,
 }
 export const routeTree = rootRouteImport

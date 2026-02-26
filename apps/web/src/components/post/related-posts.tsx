@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import type { Post } from "@/types/post";
 import type { PostTypeAll } from "./types";
 
@@ -14,40 +13,27 @@ export function RelatedPosts({ posts, limit = 3 }: RelatedPostsProps) {
   const displayPosts = posts.slice(0, limit);
 
   return (
-    <section className="py-12">
-      <h3 className="mb-8 font-bold text-2xl">Related Articles</h3>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <section>
+      <h3 className="mb-4 font-medium text-foreground/80 text-sm uppercase tracking-wider">
+        Related posts
+      </h3>
+      <ul className="space-y-3">
         {displayPosts.map((post) => {
           const slug =
             post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
           return (
-            <Link
-              key={post.id}
-              to="/blog/$slug"
-              params={{ slug }}
-              className="group rounded-lg border border-border/40 bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:bg-card/80"
-            >
-              <div className="space-y-3">
-                {post.category && (
-                  <span className="inline-block rounded-full bg-primary/10 px-2.5 py-1 font-medium text-primary text-xs">
-                    {post.category.name}
-                  </span>
-                )}
-                <h4 className="line-clamp-2 font-semibold text-lg transition-colors duration-200 group-hover:text-primary">
-                  {post.title}
-                </h4>
-                <p className="line-clamp-2 text-foreground/60 text-sm">
-                  {post.excerpt}
-                </p>
-                <div className="flex items-center gap-2 pt-2 font-medium text-primary text-sm">
-                  Read More
-                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </div>
-              </div>
-            </Link>
+            <li key={post.id}>
+              <Link
+                to="/blog/$slug"
+                params={{ slug }}
+                className="text-foreground/70 text-sm hover:text-foreground hover:underline"
+              >
+                {post.title}
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </section>
   );
 }

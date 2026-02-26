@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
 import { PostCard } from "@/components/post/post-card";
 import { orpc } from "@/utils/orpc";
 
@@ -9,80 +8,73 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  const { data: posts, isLoading } = useQuery(
+  const { data: posts = [], isLoading, isError, error } = useQuery(
     orpc.post.getPosts.queryOptions(),
   );
 
   return (
-    <main className="w-full bg-linear-to-b from-background via-background to-background/50">
-      {/* Hero Section */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-        <div className="flex max-w-2xl flex-col gap-6">
-          <div className="space-y-4">
-            <h1 className="font-bold text-4xl tracking-tight sm:text-5xl lg:text-6xl">
-              <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                DevJams
-              </span>
-            </h1>
-            <p className="font-light text-foreground/70 text-lg leading-relaxed sm:text-xl">
-              Sharing experiences, knowledge, and technical insights about web
-              development, software architecture, and building products that
-              matter.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
+    <main className="w-full">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        {/* Simple blog intro — no hero, no CTAs */}
+        <header className="mb-12 border-border/50 border-b pb-8">
+          <h1 className="font-semibold text-2xl tracking-tight text-foreground sm:text-3xl">
+            DevJams
+          </h1>
+          <p className="mt-2 text-foreground/70 text-base leading-relaxed">
+            A personal blog about DevOps, infrastructure, CI/CD, and making
+            systems reliable. Notes from the trenches.
+          </p>
+          <nav className="mt-4 flex gap-6 text-sm">
             <Link
-              to="/blog/"
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90 hover:scale-105"
+              to="/blog"
+              className="text-foreground/60 underline-offset-4 hover:text-foreground hover:underline"
             >
-              Explore Posts
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+              All posts
             </Link>
             <Link
               to="/about"
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 transition-all duration-200 hover:bg-accent hover:scale-105"
+              className="text-foreground/60 underline-offset-4 hover:text-foreground hover:underline"
             >
-              Learn More
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+              About
             </Link>
-          </div>
-        </div>
-      </section>
+          </nav>
+        </header>
 
-      {/* Latest Posts Section */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-        <div className="mb-12">
-          <h2 className="mb-2 font-bold text-3xl sm:text-4xl">
-            Latest Articles
+        {/* Recent posts — content first */}
+        <section>
+          <h2 className="mb-6 font-medium text-foreground/80 text-sm uppercase tracking-wider">
+            Recent posts
           </h2>
-          <p className="text-foreground/60">
-            Thoughts on tech, development, and building better software
-          </p>
-        </div>
 
-        {isLoading && (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-48 animate-pulse rounded-lg bg-accent/50"
-              />
-            ))}
-          </div>
-        )}
+          {isLoading && (
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-40 animate-pulse rounded-md bg-muted/50"
+                />
+              ))}
+            </div>
+          )}
 
-        {posts && posts.length > 0 ? (
-          <div className="grid gap-6 md:gap-8">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        ) : (
-          <div className="py-12 text-center">
-            <p className="text-foreground/60">No posts yet. Check back soon!</p>
-          </div>
-        )}
-      </section>
+          {isError ? (
+            <p className="text-foreground/50 text-sm">
+              Couldn’t load posts. {error?.message ?? "Try again later."}
+            </p>
+          ) : posts.length > 0 ? (
+            <div className="space-y-8">
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-foreground/50 text-sm">
+              No posts yet. Create one in the admin or run the database seed for
+              sample data.
+            </p>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

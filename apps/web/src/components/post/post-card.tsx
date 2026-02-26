@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Clock, Tag } from "lucide-react";
-import type { Post } from "@/types/post";
+import { Calendar, Clock } from "lucide-react";
 import type { PostTypeAll } from "./types";
 
 interface PostCardProps {
@@ -18,14 +17,21 @@ export function PostCard({ post }: PostCardProps) {
   const categoryName = post.category?.name;
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-border/40 bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5 sm:p-8">
-      {/* Background gradient on hover */}
-      <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    <article className="group rounded-lg border border-border/30 bg-transparent p-5 transition-colors hover:border-border hover:bg-muted/30 sm:p-6">
 
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2 text-sm">
+            {post.series && (
+              <Link
+                to="/blog/series/$series"
+                params={{ series: post.series.slug }}
+                className="rounded-full bg-muted px-2.5 py-1 font-medium text-foreground/70 text-xs hover:bg-muted/80"
+              >
+                Series: {post.series.title}
+              </Link>
+            )}
             {categoryName && (
               <Link
                 to="/blog/category/$category"
@@ -56,7 +62,7 @@ export function PostCard({ post }: PostCardProps) {
             )}
           </div>
 
-          <h3 className="font-bold text-2xl text-foreground transition-colors duration-300 group-hover:text-primary sm:text-3xl">
+          <h3 className="font-semibold text-xl text-foreground sm:text-2xl">
             {post.title}
           </h3>
 
@@ -89,14 +95,12 @@ export function PostCard({ post }: PostCardProps) {
             </div>
           </div>
 
-          {/* Read More Link */}
           <Link
             to="/blog/$slug"
             params={{ slug }}
-            className="group/link inline-flex items-center gap-2 font-medium text-primary"
+            className="text-foreground/70 text-sm hover:text-foreground hover:underline"
           >
-            Read Article
-            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/link:translate-x-1" />
+            Read more →
           </Link>
         </div>
       </div>

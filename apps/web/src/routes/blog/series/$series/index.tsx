@@ -4,21 +4,25 @@ import { orpc } from "@/utils/orpc";
 import { PostCard } from "@/components/post/post-card";
 import { PostCardGridSkeleton } from "@/components/skeletons/post-card-skeleton";
 
-export const Route = createFileRoute("/blog/category/$category/")({
-  component: CategoryPageComponent,
+export const Route = createFileRoute("/blog/series/$series/")({
+  component: SeriesPageComponent,
 });
 
-function CategoryPageComponent() {
-  const { category } = useParams({ from: "/blog/category/$category/" });
+function SeriesPageComponent() {
+  const { series: seriesSlug } = useParams({ from: "/blog/series/$series/" });
   const { data: posts = [], isLoading } = useQuery(
     orpc.post.getPosts.queryOptions(),
   );
-  const decodedCategory = decodeURIComponent(category);
-  const filteredPosts =
-    posts.filter(
-      (p) =>
-        p.category?.name.toLowerCase() === decodedCategory.toLowerCase(),
-    );
+
+  const decodedSeries = decodeURIComponent(seriesSlug);
+  const seriesPosts = posts.filter(
+    (p) => p.series?.slug.toLowerCase() === decodedSeries.toLowerCase(),
+  );
+
+  const sortedByOrder = [...seriesPosts].sort(
+    (a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0),
+  );
+  const seriesTitle = seriesPosts[0]?.series?.title ?? decodedSeries;
 
   return (
     <main className="min-h-screen">
@@ -31,24 +35,24 @@ function CategoryPageComponent() {
         </Link>
         <header className="mt-4 border-border/30 border-b pb-6">
           <h1 className="font-semibold text-2xl text-foreground sm:text-3xl">
-            Category: {decodedCategory}
+            Series: {seriesTitle}
           </h1>
           <p className="mt-1 text-foreground/60 text-sm">
-            {filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""}{" "}
-            in this category
+            {sortedByOrder.length} post{sortedByOrder.length !== 1 ? "s" : ""}{" "}
+            in this series
           </p>
         </header>
 
         <section className="mt-8 space-y-8">
           {isLoading ? (
             <PostCardGridSkeleton count={4} />
-          ) : filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => (
+          ) : sortedByOrder.length > 0 ? (
+            sortedByOrder.map((post) => (
               <PostCard key={post.id} post={post} />
             ))
           ) : (
             <p className="text-foreground/50 text-sm">
-              No posts found in this category.
+              No posts found in this series.
             </p>
           )}
         </section>

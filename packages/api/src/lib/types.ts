@@ -15,3 +15,11 @@ export const postCreateSchema = z.object({
 });
 
 export type PostCreateInput = z.infer<typeof postCreateSchema>;
+
+export const postUpdateSchema = z.object({
+	id: z.string(),
+	published: z.boolean().optional(),
+	archived: z.boolean().optional(),
+});
+
+export type PostUpdateInput = z.infer<typeof postUpdateSchema>;

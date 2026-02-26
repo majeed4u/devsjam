@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { PostCard } from "@/components/post/post-card";
 import { orpc } from "@/utils/orpc";
 
@@ -13,13 +14,13 @@ function HomeComponent() {
   );
 
   return (
-    <main className="w-full bg-gradient-to-b from-background via-background to-background/50">
+    <main className="w-full bg-linear-to-b from-background via-background to-background/50">
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div className="flex max-w-2xl flex-col gap-6">
           <div className="space-y-4">
             <h1 className="font-bold text-4xl tracking-tight sm:text-5xl lg:text-6xl">
-              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 DevJams
               </span>
             </h1>
@@ -30,12 +31,20 @@ function HomeComponent() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="rounded-lg bg-primary px-6 py-2 font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/90">
+            <Link
+              to="/blog/"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90 hover:scale-105"
+            >
               Explore Posts
-            </button>
-            <button className="rounded-lg border border-border px-6 py-2 transition-colors duration-200 hover:bg-accent">
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 transition-all duration-200 hover:bg-accent hover:scale-105"
+            >
               Learn More
-            </button>
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </section>

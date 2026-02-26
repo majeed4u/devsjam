@@ -1,12 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import type { Post } from "@/types/post";
+import type { PostTypeAll } from "./types";
 
 interface RelatedPostsProps {
-  posts: (Post & {
-    category?: { id: string; name: string };
-    tags?: Array<{ id: string; name: string; slug: string }>;
-  })[];
+  posts: PostTypeAll[];
   limit?: number;
 }
 

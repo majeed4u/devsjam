@@ -63,7 +63,7 @@ export function DashboardStats() {
         return (
           <div
             key={stat.label}
-            className={`rounded-lg border border-border/40 bg-gradient-to-br ${stat.color} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg`}
+            className={`rounded-lg border border-border/40 bg-linear-to-br ${stat.color} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg`}
           >
             <div className="mb-4 flex items-start justify-between">
               <div>

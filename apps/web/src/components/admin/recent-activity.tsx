@@ -64,7 +64,7 @@ export function RecentActivity({ posts }: RecentActivityProps) {
               <Link
                 to="/admin/post/$postId/edit"
                 params={{ postId: post.id }}
-                className="ml-4 flex-shrink-0 text-primary transition-colors duration-200 hover:text-primary/80"
+                className="ml-4 shrink-0 text-primary transition-colors duration-200 hover:text-primary/80"
               >
                 <ArrowRight className="h-5 w-5" />
               </Link>

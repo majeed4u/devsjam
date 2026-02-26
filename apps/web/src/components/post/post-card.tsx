@@ -1,12 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, Clock, Tag } from "lucide-react";
 import type { Post } from "@/types/post";
+import type { PostTypeAll } from "./types";
 
 interface PostCardProps {
-  post: Post & {
-    category?: { id: string; name: string };
-    tags?: Array<{ id: string; name: string; slug: string }>;
-  };
+  post: PostTypeAll;
 }
 
 export function PostCard({ post }: PostCardProps) {
@@ -22,7 +20,7 @@ export function PostCard({ post }: PostCardProps) {
   return (
     <article className="group relative overflow-hidden rounded-xl border border-border/40 bg-card/50 p-6 transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5 sm:p-8">
       {/* Background gradient on hover */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 -z-10 bg-linear-to-r from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       <div className="flex flex-col gap-6">
         {/* Header */}

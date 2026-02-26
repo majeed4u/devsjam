@@ -1,12 +1,12 @@
 import prisma from "@devjams/db";
 
 export const posts = [
-  {
-    title: "Why I Chose Bun + Elysia for DevJams",
-    slug: "why-i-chose-bun-elysia",
-    excerpt:
-      "Breaking down the architectural decisions behind choosing Bun and Elysia for a production-grade blog platform.",
-    content: `
+	{
+		title: "Why I Chose Bun + Elysia for DevJams",
+		slug: "why-i-chose-bun-elysia",
+		excerpt:
+			"Breaking down the architectural decisions behind choosing Bun and Elysia for a production-grade blog platform.",
+		content: `
 # Why I Chose Bun + Elysia
 
 When building DevJams, I had two goals:
@@ -44,21 +44,21 @@ Compared to Express:
 
 For a content-driven platform like DevJams, Bun + Elysia gives me full control without unnecessary abstraction.
 `,
-    readingTime: 6,
-    published: true,
-    views: 120,
-    categorySlug: "backend",
-    seriesSlug: "building-devjams",
-    seriesOrder: 1,
-    tagSlugs: ["bun", "elysia", "performance"],
-  },
+		readingTime: 6,
+		published: true,
+		views: 120,
+		categorySlug: "backend",
+		seriesSlug: "building-devjams",
+		seriesOrder: 1,
+		tagSlugs: ["bun", "elysia", "performance"],
+	},
 
-  {
-    title: "Designing a Scalable Prisma Schema for a Blog",
-    slug: "scalable-prisma-blog-schema",
-    excerpt:
-      "How to design a production-ready Prisma schema with tags, categories, and series support.",
-    content: `
+	{
+		title: "Designing a Scalable Prisma Schema for a Blog",
+		slug: "scalable-prisma-blog-schema",
+		excerpt:
+			"How to design a production-ready Prisma schema with tags, categories, and series support.",
+		content: `
 # Designing a Scalable Prisma Schema
 
 Schema design is where most projects fail early.
@@ -97,21 +97,21 @@ Important indexes:
 
 Keep schema simple. Add complexity only when needed.
 `,
-    readingTime: 8,
-    published: true,
-    views: 98,
-    categorySlug: "backend",
-    seriesSlug: "building-devjams",
-    seriesOrder: 2,
-    tagSlugs: ["prisma", "postgres", "architecture"],
-  },
+		readingTime: 8,
+		published: true,
+		views: 98,
+		categorySlug: "backend",
+		seriesSlug: "building-devjams",
+		seriesOrder: 2,
+		tagSlugs: ["prisma", "postgres", "architecture"],
+	},
 
-  {
-    title: "Kubernetes From Zero: What It Actually Does",
-    slug: "kubernetes-from-zero",
-    excerpt:
-      "A practical explanation of what Kubernetes really does in production environments.",
-    content: `
+	{
+		title: "Kubernetes From Zero: What It Actually Does",
+		slug: "kubernetes-from-zero",
+		excerpt:
+			"A practical explanation of what Kubernetes really does in production environments.",
+		content: `
 # Kubernetes From Zero
 
 Kubernetes is not magic.
@@ -149,21 +149,21 @@ Kubernetes shines when:
 
 This is the foundation of modern infrastructure.
 `,
-    readingTime: 10,
-    published: true,
-    views: 210,
-    categorySlug: "devops",
-    seriesSlug: "kubernetes-from-scratch",
-    seriesOrder: 1,
-    tagSlugs: ["kubernetes", "devops"],
-  },
+		readingTime: 10,
+		published: true,
+		views: 210,
+		categorySlug: "devops",
+		seriesSlug: "kubernetes-from-scratch",
+		seriesOrder: 1,
+		tagSlugs: ["kubernetes", "devops"],
+	},
 
-  {
-    title: "Preventing Double Jenkins Webhook Triggers",
-    slug: "preventing-double-jenkins-triggers",
-    excerpt:
-      "How I debugged and fixed duplicate webhook builds in a mono-repo CI pipeline.",
-    content: `
+	{
+		title: "Preventing Double Jenkins Webhook Triggers",
+		slug: "preventing-double-jenkins-triggers",
+		excerpt:
+			"How I debugged and fixed duplicate webhook builds in a mono-repo CI pipeline.",
+		content: `
 # Preventing Double Jenkins Triggers
 
 If you're using a mono-repo, you may encounter double builds.
@@ -191,21 +191,21 @@ when {
 
 CI pipelines must be carefully scoped in mono-repos.
 `,
-    readingTime: 6,
-    published: true,
-    views: 75,
-    categorySlug: "devops",
-    seriesSlug: "production-cicd",
-    seriesOrder: 1,
-    tagSlugs: ["jenkins", "ci-cd"],
-  },
+		readingTime: 6,
+		published: true,
+		views: 75,
+		categorySlug: "devops",
+		seriesSlug: "production-cicd",
+		seriesOrder: 1,
+		tagSlugs: ["jenkins", "ci-cd"],
+	},
 
-  {
-    title: "External Kafka with TLS Passthrough Using Traefik",
-    slug: "external-kafka-tls-traefik",
-    excerpt:
-      "Exposing Kafka externally using Traefik with TLS passthrough and cert-manager.",
-    content: `
+	{
+		title: "External Kafka with TLS Passthrough Using Traefik",
+		slug: "external-kafka-tls-traefik",
+		excerpt:
+			"Exposing Kafka externally using Traefik with TLS passthrough and cert-manager.",
+		content: `
 # External Kafka with TLS Passthrough
 
 Exposing Kafka securely is not trivial.
@@ -235,89 +235,89 @@ Always test with:
 
 Secure messaging is critical in production systems.
 `,
-    readingTime: 13,
-    published: true,
-    views: 180,
-    categorySlug: "devops",
-    seriesSlug: null,
-    seriesOrder: null,
-    tagSlugs: ["kafka", "traefik", "tls", "kubernetes"],
-  },
+		readingTime: 13,
+		published: true,
+		views: 180,
+		categorySlug: "devops",
+		seriesSlug: null,
+		seriesOrder: null,
+		tagSlugs: ["kafka", "traefik", "tls", "kubernetes"],
+	},
 ];
 
 async function seed() {
-  // 1️⃣ Create Categories
-  await prisma.category.createMany({
-    data: [
-      { name: "Backend", slug: "backend" },
-      { name: "DevOps", slug: "devops" },
-    ],
-    skipDuplicates: true,
-  });
+	// 1️⃣ Create Categories
+	await prisma.category.createMany({
+		data: [
+			{ name: "Backend", slug: "backend" },
+			{ name: "DevOps", slug: "devops" },
+		],
+		skipDuplicates: true,
+	});
 
-  // 2️⃣ Create Series
-  await prisma.series.createMany({
-    data: [
-      { title: "Building DevJams", slug: "building-devjams" },
-      { title: "Kubernetes From Scratch", slug: "kubernetes-from-scratch" },
-      { title: "Production CI/CD", slug: "production-cicd" },
-    ],
-    skipDuplicates: true,
-  });
+	// 2️⃣ Create Series
+	await prisma.series.createMany({
+		data: [
+			{ title: "Building DevJams", slug: "building-devjams" },
+			{ title: "Kubernetes From Scratch", slug: "kubernetes-from-scratch" },
+			{ title: "Production CI/CD", slug: "production-cicd" },
+		],
+		skipDuplicates: true,
+	});
 
-  // 3️⃣ Create Tags
-  await prisma.tag.createMany({
-    data: [
-      { name: "Bun", slug: "bun" },
-      { name: "Elysia", slug: "elysia" },
-      { name: "Performance", slug: "performance" },
-      { name: "Prisma", slug: "prisma" },
-      { name: "Postgres", slug: "postgres" },
-      { name: "Architecture", slug: "architecture" },
-      { name: "Kubernetes", slug: "kubernetes" },
-      { name: "DevOps", slug: "devops" },
-      { name: "Jenkins", slug: "jenkins" },
-      { name: "CI/CD", slug: "ci-cd" },
-      { name: "Kafka", slug: "kafka" },
-      { name: "Traefik", slug: "traefik" },
-      { name: "TLS", slug: "tls" },
-    ],
-    skipDuplicates: true,
-  });
+	// 3️⃣ Create Tags
+	await prisma.tag.createMany({
+		data: [
+			{ name: "Bun", slug: "bun" },
+			{ name: "Elysia", slug: "elysia" },
+			{ name: "Performance", slug: "performance" },
+			{ name: "Prisma", slug: "prisma" },
+			{ name: "Postgres", slug: "postgres" },
+			{ name: "Architecture", slug: "architecture" },
+			{ name: "Kubernetes", slug: "kubernetes" },
+			{ name: "DevOps", slug: "devops" },
+			{ name: "Jenkins", slug: "jenkins" },
+			{ name: "CI/CD", slug: "ci-cd" },
+			{ name: "Kafka", slug: "kafka" },
+			{ name: "Traefik", slug: "traefik" },
+			{ name: "TLS", slug: "tls" },
+		],
+		skipDuplicates: true,
+	});
 
-  // 4️⃣ Now create posts
-  for (const post of posts) {
-    await prisma.post.create({
-      data: {
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        content: post.content,
-        readingTime: post.readingTime,
-        published: post.published,
-        views: post.views,
-        author: { connect: { id: "ljNlmyR2qsRNwxGYIFiOaqLG3zYCQ8eX" } },
-        category: { connect: { slug: post.categorySlug } },
-        series: post.seriesSlug
-          ? { connect: { slug: post.seriesSlug } }
-          : undefined,
-        seriesOrder: post.seriesOrder ?? undefined,
-        tags: {
-          create: post.tagSlugs.map((slug) => ({
-            tag: { connect: { slug } },
-          })),
-        },
-      },
-    });
-  }
+	// 4️⃣ Now create posts
+	for (const post of posts) {
+		await prisma.post.create({
+			data: {
+				title: post.title,
+				slug: post.slug,
+				excerpt: post.excerpt,
+				content: post.content,
+				readingTime: post.readingTime,
+				published: post.published,
+				views: post.views,
+				author: { connect: { id: "ljNlmyR2qsRNwxGYIFiOaqLG3zYCQ8eX" } },
+				category: { connect: { slug: post.categorySlug } },
+				series: post.seriesSlug
+					? { connect: { slug: post.seriesSlug } }
+					: undefined,
+				seriesOrder: post.seriesOrder ?? undefined,
+				tags: {
+					create: post.tagSlugs.map((slug) => ({
+						tag: { connect: { slug } },
+					})),
+				},
+			},
+		});
+	}
 }
 
 seed()
-  .then(() => {
-    console.log("Seeding completed.");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Error seeding data:", error);
-    process.exit(1);
-  });
+	.then(() => {
+		console.log("Seeding completed.");
+		process.exit(0);
+	})
+	.catch((error) => {
+		console.error("Error seeding data:", error);
+		process.exit(1);
+	});

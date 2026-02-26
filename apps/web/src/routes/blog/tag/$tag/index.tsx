@@ -1,4 +1,4 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
 import { PostCard } from "@/components/post/post-card";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/blog/tag/$tag/")({
 });
 
 function TagPageComponent() {
-  const { tag } = useParams();
+  const { tag } = useParams({ from: "/blog/tag/$tag/" });
   const { data: posts, isLoading } = useQuery(
     orpc.post.getPosts.queryOptions(),
   );
@@ -26,13 +26,13 @@ function TagPageComponent() {
       <section className="mx-auto max-w-6xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="space-y-4 animate-fade-in">
-          <a
-            href="/blog/"
+          <Link
+            to="/blog"
             className="inline-flex items-center gap-2 text-primary font-medium hover:translate-x-1 transition-transform duration-200"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Blog
-          </a>
+          </Link>
           <div>
             <h1 className="text-4xl font-bold">Tag: {decodedTag}</h1>
             <p className="text-foreground/60 mt-2">

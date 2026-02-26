@@ -1,20 +1,16 @@
-import {
-  createFileRoute,
-  getRouteApi,
-  useParams,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
 import { PostCard } from "@/components/post/post-card";
 import { PostCardGridSkeleton } from "@/components/skeletons/post-card-skeleton";
 import { ArrowLeft } from "lucide-react";
-const routeApi = getRouteApi("/blog/category/$category/");
+
 export const Route = createFileRoute("/blog/category/$category/")({
   component: CategoryPageComponent,
 });
 
 function CategoryPageComponent() {
-  const { category } = routeApi.useParams();
+  const { category } = useParams({ from: "/blog/category/$category/" });
   const { data: posts, isLoading } = useQuery(
     orpc.post.getPosts.queryOptions(),
   );
@@ -30,13 +26,13 @@ function CategoryPageComponent() {
       <section className="mx-auto max-w-6xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="space-y-4 animate-fade-in">
-          <a
-            href="/blog/"
+          <Link
+            to="/blog"
             className="inline-flex items-center gap-2 text-primary font-medium hover:translate-x-1 transition-transform duration-200"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Blog
-          </a>
+          </Link>
           <div>
             <h1 className="text-4xl font-bold">Category: {decodedCategory}</h1>
             <p className="text-foreground/60 mt-2">

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, Clock, Tag } from "lucide-react";
-import type { Post } from "../../../../packages/db/prisma/generated/client";
+import type { Post } from "@/types/post";
 
 interface PostCardProps {
   post: Post & {
@@ -30,7 +30,8 @@ export function PostCard({ post }: PostCardProps) {
           <div className="flex flex-wrap items-center gap-2 text-sm">
             {categoryName && (
               <Link
-                to={`/blog/category/${encodeURIComponent(categoryName)}/`}
+                to="/blog/category/$category"
+                params={{ category: categoryName }}
                 className="rounded-full bg-primary/10 px-2.5 py-1 font-medium text-primary text-xs transition-colors duration-200 hover:bg-primary/20"
               >
                 {categoryName}
@@ -41,7 +42,8 @@ export function PostCard({ post }: PostCardProps) {
                 {post.tags.slice(0, 2).map((tag) => (
                   <Link
                     key={tag.id}
-                    to={`/blog/tag/${encodeURIComponent(tag.name)}/`}
+                    to="/blog/tag/$tag"
+                    params={{ tag: tag.name }}
                     className="rounded-full bg-accent/50 px-2.5 py-1 font-medium text-foreground/70 text-xs transition-colors duration-200 hover:bg-accent"
                   >
                     {tag.name}
@@ -91,7 +93,8 @@ export function PostCard({ post }: PostCardProps) {
 
           {/* Read More Link */}
           <Link
-            to={`/blog/${slug}/`}
+            to="/blog/$slug"
+            params={{ slug }}
             className="group/link inline-flex items-center gap-2 font-medium text-primary"
           >
             Read Article

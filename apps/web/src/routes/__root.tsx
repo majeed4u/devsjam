@@ -7,11 +7,14 @@ import {
   HeadContent,
   Outlet,
   createRootRouteWithContext,
+  useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useState } from "react";
 
 import Header from "@/components/header";
+import { BlogHeader } from "@/components/blog-header";
+import { BlogFooter } from "@/components/blog-footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { link, orpc } from "@/utils/orpc";
@@ -47,6 +50,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 function RootComponent() {
   const [client] = useState<AppRouterClient>(() => createORPCClient(link));
   const [orpcUtils] = useState(() => createTanstackQueryUtils(client));
+  const location = useLocation();
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAuthRoute = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
@@ -57,9 +64,27 @@ function RootComponent() {
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
-          {/* <Header /> */}
-          <Outlet />
+        <div className="flex flex-col min-h-svh">
+          {/* Conditionally render header based on route */}
+          {!isAdminRoute && !isAuthRoute && <BlogHeader />}
+
+          {/* Main content area */}
+          <div className="flex-1">
+            {isAdminRoute ? (
+              // Admin layout with existing structure
+              <div className="grid grid-rows-[auto_1fr] h-full">
+                <Outlet />
+              </div>
+            ) : (
+              // Public blog layout with full width content
+              <div className="w-full">
+                <Outlet />
+              </div>
+            )}
+          </div>
+
+          {/* Footer - only for public routes */}
+          {!isAdminRoute && !isAuthRoute && <BlogFooter />}
         </div>
         <Toaster richColors />
       </ThemeProvider>

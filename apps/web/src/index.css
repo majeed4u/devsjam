@@ -288,3 +288,230 @@
 .prose :where(h1, h2, h3, h4):not(:where([class~="not-prose"] *)) {
   color: inherit;
 }
+
+/* Enhanced Prose Styling */
+.prose {
+  max-width: none;
+  --prose-body: rgb(55 65 81);
+  --prose-headings: rgb(17 24 39);
+  --prose-lead: rgb(75 85 99);
+  --prose-links: rgb(37 99 235);
+  --prose-bold: rgb(17 24 39);
+  --prose-counters: rgb(107 114 128);
+  --prose-bullets: rgb(107 114 128);
+  --prose-hr: rgb(229 231 235);
+  --prose-quotes: rgb(107 114 128);
+  --prose-quote-borders: rgb(229 213 219);
+  --prose-captions: rgb(107 114 128);
+  --prose-code: rgb(31 41 55);
+  --prose-pre-bg: rgb(243 244 246);
+  --prose-pre-code: rgb(31 41 55);
+  --prose-th-borders: rgb(209 213 219);
+  --prose-td-borders: rgb(229 231 235);
+  --prose-keyboard: rgb(17 24 39);
+  --prose-keyboard-bg: rgb(243 244 246);
+}
+
+.dark .prose {
+  --prose-body: rgb(229 231 235);
+  --prose-headings: white;
+  --prose-lead: rgb(209 213 219);
+  --prose-links: rgb(96 165 250);
+  --prose-bold: white;
+  --prose-counters: rgb(156 163 175);
+  --prose-bullets: rgb(107 114 128);
+  --prose-hr: rgb(75 85 99);
+  --prose-quotes: rgb(156 163 175);
+  --prose-quote-borders: rgb(75 85 99);
+  --prose-captions: rgb(156 163 175);
+  --prose-code: rgb(209 213 219);
+  --prose-pre-bg: rgb(17 24 39);
+  --prose-pre-code: rgb(229 231 235);
+  --prose-th-borders: rgb(75 85 99);
+  --prose-td-borders: rgb(55 65 81);
+  --prose-keyboard: white;
+  --prose-keyboard-bg: rgb(31 41 55);
+}
+
+/* Prose Typography */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--prose-headings);
+  scroll-margin-top: 100px;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+}
+
+.prose h2 {
+  font-size: 1.875em;
+  border-bottom: 1px solid var(--prose-hr);
+  padding-bottom: 0.5em;
+}
+
+.prose h3 {
+  font-size: 1.5em;
+}
+
+.prose h4 {
+  font-size: 1.25em;
+}
+
+.prose p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  line-height: 1.75;
+  color: var(--prose-body);
+}
+
+.prose a {
+  color: var(--prose-links);
+  text-decoration: underline;
+  text-decoration-color: var(--prose-links);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: all 0.3s ease;
+}
+
+.prose a:hover {
+  opacity: 0.8;
+}
+
+.prose strong {
+  color: var(--prose-bold);
+  font-weight: 600;
+}
+
+.prose code {
+  color: var(--prose-code);
+  background-color: var(--prose-pre-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  font-weight: 500;
+  font-family: var(--font-mono);
+}
+
+.prose pre {
+  background-color: var(--prose-pre-bg);
+  color: var(--prose-pre-code);
+  border-radius: 0.5rem;
+  padding: 1.5em;
+  overflow-x: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border: 1px solid var(--prose-hr);
+}
+
+.prose pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.9em;
+  font-weight: 400;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--prose-quote-borders);
+  color: var(--prose-quotes);
+  padding-left: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  font-style: italic;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.75;
+}
+
+.prose img {
+  margin-top: 2em;
+  margin-bottom: 2em;
+  border-radius: 0.5rem;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.prose th {
+  border-bottom: 2px solid var(--prose-th-borders);
+  padding: 0.75em;
+  text-align: left;
+  font-weight: 600;
+}
+
+.prose td {
+  border-bottom: 1px solid var(--prose-td-borders);
+  padding: 0.75em;
+}
+
+/* Smooth Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.5s ease-out;
+}

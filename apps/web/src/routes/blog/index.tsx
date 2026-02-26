@@ -10,9 +10,12 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogComponent() {
-  const { data: posts = [], isLoading, isError, error } = useQuery(
-    orpc.post.getPosts.queryOptions(),
-  );
+  const {
+    data: posts = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery(orpc.post.getPosts.queryOptions());
 
   const { categories, tags, series } = useMemo(() => {
     const catMap = new Map<string, { name: string; slug: string }>();
@@ -41,7 +44,7 @@ function BlogComponent() {
 
   return (
     <main className="min-h-screen">
-      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <header className="mb-8">
           <h1 className="font-semibold text-2xl text-foreground sm:text-3xl">
             Blog
@@ -109,7 +112,7 @@ function BlogComponent() {
         </nav>
       </section>
 
-      <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
+      <section className="mx-auto max-w-4xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
         {isLoading ? (
           <PostCardGridSkeleton count={6} />
         ) : posts && posts.length > 0 ? (

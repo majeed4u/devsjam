@@ -7,7 +7,7 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   return (
     <main className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-3xl space-y-6">
+      <section className="mx-auto max-w-4xl space-y-6">
         <h1 className="font-semibold text-2xl text-foreground sm:text-3xl">
           About DevJams
         </h1>

@@ -8,19 +8,22 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  const { data: posts = [], isLoading, isError, error } = useQuery(
-    orpc.post.getPosts.queryOptions(),
-  );
+  const {
+    data: posts = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery(orpc.post.getPosts.queryOptions());
 
   return (
     <main className="w-full">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         {/* Simple blog intro — no hero, no CTAs */}
         <header className="mb-12 border-border/50 border-b pb-8">
           <h1 className="font-semibold text-2xl tracking-tight text-foreground sm:text-3xl">
             DevJams
           </h1>
-          <p className="mt-2 text-foreground/70 text-base leading-relaxed">
+          <p className="mt-2 text-foreground/70 text-xl font-medium leading-relaxed">
             A personal blog about DevOps, infrastructure, CI/CD, and making
             systems reliable. Notes from the trenches.
           </p>

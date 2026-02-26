@@ -2,13 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
 import { TrendingUp, Eye, BookOpen, Users } from "lucide-react";
+import { DashboardStatsSkeleton } from "@/components/skeletons/admin-skeleton";
 
 export const Route = createFileRoute("/admin/analytics/")({
   component: AnalyticsComponent,
 });
 
 function AnalyticsComponent() {
-  const { data: posts } = useQuery(orpc.post.getPosts.queryOptions());
+  const { data: posts, isLoading } = useQuery(
+    orpc.post.getPosts.queryOptions(),
+  );
+
+  if (isLoading) {
+    return <DashboardStatsSkeleton />;
+  }
 
   // Calculate analytics
   const totalPosts = posts?.length ?? 0;
@@ -55,7 +62,7 @@ function AnalyticsComponent() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Analytics</h1>
@@ -66,12 +73,13 @@ function AnalyticsComponent() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => {
+        {stats.map((stat, idx) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.label}
-              className={`rounded-lg border border-border/40 bg-gradient-to-br ${stat.color} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg`}
+              className={`rounded-lg border border-border/40 bg-gradient-to-br ${stat.color} p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:scale-105 animate-slide-in-up`}
+              style={{ animationDelay: `${idx * 0.1}s` }}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -95,7 +103,10 @@ function AnalyticsComponent() {
       </div>
 
       {/* Top Posts */}
-      <div className="rounded-lg border border-border/40 bg-card/50 overflow-hidden">
+      <div
+        className="rounded-lg border border-border/40 bg-card/50 overflow-hidden animate-slide-in-up"
+        style={{ animationDelay: "0.4s" }}
+      >
         <div className="p-6 border-b border-border/40">
           <h2 className="text-xl font-bold">Top Posts</h2>
         </div>
@@ -104,7 +115,8 @@ function AnalyticsComponent() {
             {topPosts.map((post, index) => (
               <div
                 key={post.id}
-                className="p-6 flex items-center justify-between"
+                className="p-6 flex items-center justify-between hover:bg-background/30 transition-colors duration-200 animate-slide-in-up"
+                style={{ animationDelay: `${0.5 + index * 0.05}s` }}
               >
                 <div className="flex items-center gap-6 flex-1">
                   <div className="text-3xl font-bold text-primary/50 w-8">

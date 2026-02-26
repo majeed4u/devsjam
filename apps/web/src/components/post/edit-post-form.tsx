@@ -11,7 +11,26 @@ import { orpc } from "@/utils/orpc";
 import { FormCreatableSelect } from "../form-creatable-select";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
-export const NewPostForm = () => {
+import { ArrowLeft, Save } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { FormSkeleton } from "../skeletons/form-skeleton";
+
+interface EditPostFormProps {
+  postId: string;
+}
+
+export const EditPostForm = ({ postId }: EditPostFormProps) => {
+  const navigate = useNavigate();
+
+  // Fetch post data
+  const { data: post, isLoading: postLoading } = useQuery({
+    queryKey: ["post", postId],
+    queryFn: async () => {
+      const posts = await orpc.post.getPosts();
+      return posts.find((p) => p.id === postId);
+    },
+  });
+
   const { data: postCategories, isLoading: categoriesLoading } = useQuery(
     orpc.category.gets.queryOptions(),
   );
@@ -19,7 +38,13 @@ export const NewPostForm = () => {
     orpc.series.gets.queryOptions(),
   );
 
-  const createPost = useMutation(orpc.post.create.mutationOptions());
+  const updatePost = useMutation({
+    mutationFn: async (data: PostCreateInput) => {
+      // TODO: Implement update mutation in backend
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return data;
+    },
+  });
 
   const createCategory = useMutation(orpc.category.create.mutationOptions());
   const createSeries = useMutation(orpc.series.create.mutationOptions());
@@ -28,15 +53,15 @@ export const NewPostForm = () => {
   const form = useForm<PostCreateInput>({
     resolver: zodResolver(postCreateSchema),
     defaultValues: {
-      title: "",
-      excerpt: "",
-      content: "",
-      coverImage: "",
-      readingTime: 0,
-      categoryId: undefined,
-      seriesId: undefined,
-      tags: [],
-      seriesOrder: undefined,
+      title: post?.title ?? "",
+      excerpt: post?.excerpt ?? "",
+      content: post?.content ?? "",
+      coverImage: post?.coverImage ?? "",
+      readingTime: post?.readingTime ?? 0,
+      categoryId: post?.categoryId,
+      seriesId: post?.seriesId,
+      tags: post?.tags?.map((t) => t.slug) ?? [],
+      seriesOrder: post?.seriesOrder,
     },
   });
 
@@ -50,28 +75,58 @@ export const NewPostForm = () => {
 
   async function onSubmit(data: PostCreateInput) {
     try {
-      await createPost.mutateAsync(data, {
+      await updatePost.mutateAsync(data, {
         onSuccess() {
-          toast.success("Post created successfully!");
-          form.reset();
+          toast.success("Post updated successfully!");
+          navigate({ to: "/admin/post/published" });
         },
         onError(error) {
-          toast.error("Failed to create post: " + error.message);
+          toast.error("Failed to update post: " + error.message);
         },
       });
     } catch (error) {
       if (error instanceof ORPCError) {
-        toast.error("Failed to create post: " + error.message);
+        toast.error("Failed to update post: " + error.message);
       }
     }
   }
 
+  if (postLoading) {
+    return <FormSkeleton />;
+  }
+
+  if (!post) {
+    return (
+      <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-6 text-center">
+        <p className="text-red-600 dark:text-red-400 font-medium">
+          Post not found
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-6 animate-slide-in-down">
+        <button
+          onClick={() => navigate({ to: "/admin/post/published" })}
+          className="p-2 rounded-lg hover:bg-accent transition-colors duration-200 hover:scale-110 active:scale-95 duration-200"
+          title="Back"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold">Edit Post</h1>
+          <p className="text-foreground/60 mt-1">{post.title}</p>
+        </div>
+      </div>
+
       <form
-        id="new-post-form"
+        id="edit-post-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className="py-8 space-y-4"
+        className="py-8 space-y-4 animate-slide-in-up"
+        style={{ animationDelay: "0.1s" }}
       >
         <FieldGroup className="grid grid-cols-1 gap-4 lg:grid-cols-2 space-y-4">
           <FormInput form={form} label="Post Title" name="title" />
@@ -99,6 +154,7 @@ export const NewPostForm = () => {
           <div className="col-span-1 lg:col-span-2">
             <ImageUpload form={form} label="Cover Image" name="coverImage" />
           </div>
+
           {/* Category */}
           <FormCreatableSelect
             form={form}
@@ -136,21 +192,35 @@ export const NewPostForm = () => {
           />
         </FieldGroup>
 
-        <Button
-          size="lg"
-          className="w-full max-w-xs hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
-          disabled={createPost.isPending}
-          type="submit"
-        >
-          {createPost.isPending ? (
-            <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-              Creating...
-            </>
-          ) : (
-            <>✨ Create Post</>
-          )}
-        </Button>
+        <div className="flex gap-2 pt-4">
+          <Button
+            size="lg"
+            className="flex items-center gap-2 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+            disabled={updatePost.isPending}
+            type="submit"
+          >
+            {updatePost.isPending ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Save Changes
+              </>
+            )}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => navigate({ to: "/admin/post/published" })}
+            disabled={updatePost.isPending}
+            className="hover:scale-105 active:scale-95 transition-all duration-200"
+          >
+            Cancel
+          </Button>
+        </div>
       </form>
     </div>
   );

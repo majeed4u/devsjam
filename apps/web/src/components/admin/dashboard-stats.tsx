@@ -1,9 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
 import { BarChart3, BookOpen, Eye, TrendingUp } from "lucide-react";
+import { DashboardStatsSkeleton } from "../skeletons/admin-skeleton";
 
 export function DashboardStats() {
-  const { data: posts } = useQuery(orpc.post.getPosts.queryOptions());
+  const { data: posts, isLoading } = useQuery(
+    orpc.post.getPosts.queryOptions(),
+  );
+
+  if (isLoading) {
+    return <DashboardStatsSkeleton />;
+  }
 
   // Calculate stats
   const totalPosts = posts?.length ?? 0;

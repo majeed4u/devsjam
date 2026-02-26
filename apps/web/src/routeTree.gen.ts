@@ -16,6 +16,8 @@ import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugIndexRouteImport } from './routes/blog/$slug/index'
 import { Route as AdminPostIndexRouteImport } from './routes/admin/post/index'
 import { Route as AdminAnalyticsIndexRouteImport } from './routes/admin/analytics/index'
+import { Route as BlogTagTagIndexRouteImport } from './routes/blog/tag/$tag/index'
+import { Route as BlogCategoryCategoryIndexRouteImport } from './routes/blog/category/$category/index'
 import { Route as AdminPostPublishedIndexRouteImport } from './routes/admin/post/published/index'
 import { Route as AdminPostNewIndexRouteImport } from './routes/admin/post/new/index'
 import { Route as AdminPostArchivedIndexRouteImport } from './routes/admin/post/archived/index'
@@ -56,6 +58,17 @@ const AdminAnalyticsIndexRoute = AdminAnalyticsIndexRouteImport.update({
   path: '/analytics/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const BlogTagTagIndexRoute = BlogTagTagIndexRouteImport.update({
+  id: '/blog/tag/$tag/',
+  path: '/blog/tag/$tag/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogCategoryCategoryIndexRoute =
+  BlogCategoryCategoryIndexRouteImport.update({
+    id: '/blog/category/$category/',
+    path: '/blog/category/$category/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminPostPublishedIndexRoute = AdminPostPublishedIndexRouteImport.update({
   id: '/post/published/',
   path: '/post/published/',
@@ -89,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/admin/post/archived/': typeof AdminPostArchivedIndexRoute
   '/admin/post/new/': typeof AdminPostNewIndexRoute
   '/admin/post/published/': typeof AdminPostPublishedIndexRoute
+  '/blog/category/$category/': typeof BlogCategoryCategoryIndexRoute
+  '/blog/tag/$tag/': typeof BlogTagTagIndexRoute
   '/admin/post/$postId/edit/': typeof AdminPostPostIdEditIndexRoute
 }
 export interface FileRoutesByTo {
@@ -102,6 +117,8 @@ export interface FileRoutesByTo {
   '/admin/post/archived': typeof AdminPostArchivedIndexRoute
   '/admin/post/new': typeof AdminPostNewIndexRoute
   '/admin/post/published': typeof AdminPostPublishedIndexRoute
+  '/blog/category/$category': typeof BlogCategoryCategoryIndexRoute
+  '/blog/tag/$tag': typeof BlogTagTagIndexRoute
   '/admin/post/$postId/edit': typeof AdminPostPostIdEditIndexRoute
 }
 export interface FileRoutesById {
@@ -116,6 +133,8 @@ export interface FileRoutesById {
   '/admin/post/archived/': typeof AdminPostArchivedIndexRoute
   '/admin/post/new/': typeof AdminPostNewIndexRoute
   '/admin/post/published/': typeof AdminPostPublishedIndexRoute
+  '/blog/category/$category/': typeof BlogCategoryCategoryIndexRoute
+  '/blog/tag/$tag/': typeof BlogTagTagIndexRoute
   '/admin/post/$postId/edit/': typeof AdminPostPostIdEditIndexRoute
 }
 export interface FileRouteTypes {
@@ -131,6 +150,8 @@ export interface FileRouteTypes {
     | '/admin/post/archived/'
     | '/admin/post/new/'
     | '/admin/post/published/'
+    | '/blog/category/$category/'
+    | '/blog/tag/$tag/'
     | '/admin/post/$postId/edit/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,6 +165,8 @@ export interface FileRouteTypes {
     | '/admin/post/archived'
     | '/admin/post/new'
     | '/admin/post/published'
+    | '/blog/category/$category'
+    | '/blog/tag/$tag'
     | '/admin/post/$postId/edit'
   id:
     | '__root__'
@@ -157,6 +180,8 @@ export interface FileRouteTypes {
     | '/admin/post/archived/'
     | '/admin/post/new/'
     | '/admin/post/published/'
+    | '/blog/category/$category/'
+    | '/blog/tag/$tag/'
     | '/admin/post/$postId/edit/'
   fileRoutesById: FileRoutesById
 }
@@ -166,6 +191,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   BlogIndexRoute: typeof BlogIndexRoute
   BlogSlugIndexRoute: typeof BlogSlugIndexRoute
+  BlogCategoryCategoryIndexRoute: typeof BlogCategoryCategoryIndexRoute
+  BlogTagTagIndexRoute: typeof BlogTagTagIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -218,6 +245,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/analytics/'
       preLoaderRoute: typeof AdminAnalyticsIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/blog/tag/$tag/': {
+      id: '/blog/tag/$tag/'
+      path: '/blog/tag/$tag'
+      fullPath: '/blog/tag/$tag/'
+      preLoaderRoute: typeof BlogTagTagIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/category/$category/': {
+      id: '/blog/category/$category/'
+      path: '/blog/category/$category'
+      fullPath: '/blog/category/$category/'
+      preLoaderRoute: typeof BlogCategoryCategoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/post/published/': {
       id: '/admin/post/published/'
@@ -278,6 +319,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   BlogIndexRoute: BlogIndexRoute,
   BlogSlugIndexRoute: BlogSlugIndexRoute,
+  BlogCategoryCategoryIndexRoute: BlogCategoryCategoryIndexRoute,
+  BlogTagTagIndexRoute: BlogTagTagIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

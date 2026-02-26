@@ -4,6 +4,10 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { orpc } from "@/utils/orpc";
 import { PostView } from "@/components/PostView";
+import { SocialShare } from "@/components/post/social-share";
+import { AuthorBio } from "@/components/post/author-bio";
+import { RelatedPosts } from "@/components/post/related-posts";
+import { SubscribeNewsletter } from "@/components/post/subscribe-newsletter";
 
 export const Route = createFileRoute("/blog/$slug/")({
   component: BlogPostComponent,
@@ -45,8 +49,13 @@ function BlogPostComponent() {
     day: "numeric",
   });
 
+  // Filter out current post from related posts
+  const relatedPosts = posts?.filter((p) => p.id !== post.id) ?? [];
+  const postSlug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+
   return (
     <main className="min-h-screen">
+      {/* Back Navigation */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6">
         <Link
           to="/blog"
@@ -57,8 +66,10 @@ function BlogPostComponent() {
         </Link>
       </div>
 
+      {/* Post Header */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="space-y-6">
+          {/* Category/Tags */}
           <div className="flex flex-wrap gap-3">
             {post.categoryId && (
               <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
@@ -67,26 +78,35 @@ function BlogPostComponent() {
             )}
           </div>
 
+          {/* Title */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
             {post.title}
           </h1>
 
+          {/* Excerpt */}
           <p className="text-lg sm:text-xl text-foreground/70 leading-relaxed max-w-2xl">
             {post.excerpt}
           </p>
 
-          <div className="flex flex-wrap gap-4 text-sm text-foreground/60 pt-4 border-t border-border/40">
-            <div>
-              <span className="font-medium">Published:</span> {publishDate}
+          {/* Post Meta and Share */}
+          <div className="space-y-4 border-t border-border/40 pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-wrap gap-4 text-sm text-foreground/60">
+                <div>
+                  <span className="font-medium">Published:</span> {publishDate}
+                </div>
+                <div>
+                  <span className="font-medium">Reading Time:</span>{" "}
+                  {post.readingTime} min
+                </div>
+              </div>
             </div>
-            <div>
-              <span className="font-medium">Reading Time:</span>{" "}
-              {post.readingTime} min
-            </div>
+            <SocialShare title={post.title} slug={postSlug} excerpt={post.excerpt} />
           </div>
         </div>
       </section>
 
+      {/* Cover Image */}
       {post.coverImage && (
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
           <div className="relative aspect-video rounded-xl overflow-hidden bg-accent/30 border border-border/30">
@@ -99,21 +119,35 @@ function BlogPostComponent() {
         </section>
       )}
 
+      {/* Post Content */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <PostView post={post as any} />
       </section>
 
+      {/* Divider */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border-t border-border/40" />
+      </div>
+
+      {/* Author Bio */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="rounded-lg border border-border/40 bg-card/50 p-8 text-center">
-          <h3 className="text-2xl font-bold mb-2">Enjoyed this post?</h3>
-          <p className="text-foreground/60 mb-6">
-            Subscribe to get notified about new articles and insights.
-          </p>
-          <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors duration-200">
-            Subscribe
-          </button>
-        </div>
+        <AuthorBio
+          name="Majed"
+          bio="Full-stack developer passionate about building scalable applications and sharing technical knowledge. Interested in web technologies, software architecture, and open source."
+        />
       </section>
+
+      {/* Newsletter Signup */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SubscribeNewsletter />
+      </section>
+
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <RelatedPosts posts={relatedPosts} />
+        </section>
+      )}
     </main>
   );
 }

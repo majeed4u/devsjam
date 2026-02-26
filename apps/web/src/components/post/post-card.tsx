@@ -17,6 +17,7 @@ export function PostCard({ post }: PostCardProps) {
   });
 
   const slug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+  const categoryName = post.category?.name;
 
   return (
     <article className="group relative overflow-hidden rounded-xl border border-border/40 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 p-6 sm:p-8 bg-card/50 hover:bg-card/80">
@@ -26,21 +27,25 @@ export function PostCard({ post }: PostCardProps) {
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm">
-            {post.category && (
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                {post.category.name}
-              </span>
+          <div className="flex items-center gap-2 text-sm flex-wrap">
+            {categoryName && (
+              <Link
+                to={`/blog/category/${encodeURIComponent(categoryName)}`}
+                className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-200"
+              >
+                {categoryName}
+              </Link>
             )}
             {post.tags && post.tags.length > 0 && (
               <div className="flex gap-1 flex-wrap">
                 {post.tags.slice(0, 2).map((tag) => (
-                  <span
+                  <Link
                     key={tag.id}
-                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent/50 text-foreground/70"
+                    to={`/blog/tag/${encodeURIComponent(tag.name)}`}
+                    className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent/50 text-foreground/70 hover:bg-accent transition-colors duration-200"
                   >
                     {tag.name}
-                  </span>
+                  </Link>
                 ))}
                 {post.tags.length > 2 && (
                   <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent/50 text-foreground/70">

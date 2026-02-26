@@ -70,12 +70,28 @@ function BlogPostComponent() {
 				<div className="space-y-6">
 					{/* Category/Tags */}
 					<div className="flex flex-wrap gap-3">
-						{post.categoryId && (
-							<span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm">
-								Technology
-							</span>
-						)}
-					</div>
+								{post.category && (
+									<Link
+										to={`/blog/category/${encodeURIComponent(
+											post.category.name,
+										)}/`}
+										className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors duration-200 hover:bg-primary/20"
+									>
+										{post.category.name}
+									</Link>
+								)}
+								{post.tags && post.tags.length > 0 && (
+									<>
+										{post.tags.map((tag) => (
+											<Link
+												key={tag.id}
+												to={`/blog/tag/${encodeURIComponent(tag.name)}/`}
+												className="rounded-full bg-accent/50 px-3 py-1 font-medium text-foreground/70 text-sm transition-colors duration-200 hover:bg-accent"
+											>
+												{tag.name}
+											</Link>
+										))}
+									</>
 
 					{/* Title */}
 					<h1 className="font-bold text-4xl leading-tight sm:text-5xl lg:text-6xl">
@@ -124,7 +140,7 @@ function BlogPostComponent() {
 
 			{/* Post Content */}
 			<section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-				<PostView post={post as any} />
+				<PostView post={post} />
 			</section>
 
 			{/* Divider */}

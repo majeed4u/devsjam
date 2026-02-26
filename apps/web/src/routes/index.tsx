@@ -65,7 +65,7 @@ function HomeComponent() {
 				{posts && posts.length > 0 ? (
 					<div className="grid gap-6 md:gap-8">
 						{posts.map((post) => (
-							<PostCard key={post.id} post={post as any} />
+							<PostCard key={post.id} post={post} />
 						))}
 					</div>
 				) : (

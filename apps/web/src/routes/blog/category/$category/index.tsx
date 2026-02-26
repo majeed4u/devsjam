@@ -1,16 +1,20 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  getRouteApi,
+  useParams,
+} from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
 import { PostCard } from "@/components/post/post-card";
 import { PostCardGridSkeleton } from "@/components/skeletons/post-card-skeleton";
 import { ArrowLeft } from "lucide-react";
-
+const routeApi = getRouteApi("/blog/category/$category/");
 export const Route = createFileRoute("/blog/category/$category/")({
   component: CategoryPageComponent,
 });
 
 function CategoryPageComponent() {
-  const { category } = useParams();
+  const { category } = routeApi.useParams();
   const { data: posts, isLoading } = useQuery(
     orpc.post.getPosts.queryOptions(),
   );

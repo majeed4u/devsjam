@@ -57,7 +57,7 @@ function BlogComponent() {
                 className="animate-slide-in-up"
                 style={{ animationDelay: `${0.3 + idx * 0.05}s` }}
               >
-                <PostCard post={post as any} />
+                <PostCard post={post} />
               </div>
             ))}
           </div>

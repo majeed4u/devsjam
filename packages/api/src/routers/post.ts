@@ -5,8 +5,26 @@ import { generateUniqueSlug } from "../lib/generateUniqueSlug";
 import { postCreateSchema } from "../lib/types";
 
 export const postRouter = {
-	getPosts: publicProcedure.handler(() => {
-		return prisma.post.findMany();
+	getPosts: publicProcedure.handler(async () => {
+		// return posts along with their category and flattened tags
+		const posts = await prisma.post.findMany({
+			include: {
+				category: {
+					select: { id: true, name: true, slug: true },
+				},
+				tags: {
+					include: {
+						tag: { select: { id: true, name: true, slug: true } },
+					},
+				},
+			},
+		});
+
+		// flatten tags to match front-end expectations
+		return posts.map((p) => ({
+			...p,
+			tags: p.tags.map((t) => t.tag),
+		}));
 	}),
 	create: protectedProcedure
 		.input(postCreateSchema)

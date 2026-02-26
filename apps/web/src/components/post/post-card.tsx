@@ -1,12 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Calendar, Clock, Tag } from "lucide-react";
 import type { Post } from "@/types/post";
+import type { PostCardType } from "./types";
 
 interface PostCardProps {
-  post: Post & {
-    category?: { id: string; name: string };
-    tags?: Array<{ id: string; name: string; slug: string }>;
-  };
+  post: PostCardType;
 }
 
 export function PostCard({ post }: PostCardProps) {

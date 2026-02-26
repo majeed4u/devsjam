@@ -109,7 +109,7 @@ export const EditPostForm = ({ postId }: EditPostFormProps) => {
       <div className="mb-6 flex animate-slide-in-down items-center gap-4">
         <button
           onClick={() => navigate({ to: "/admin/post/published" })}
-          className="rounded-lg p-2 transition-colors duration-200 duration-200 hover:scale-110 hover:bg-accent active:scale-95"
+          className="rounded-lg p-2 transition-colors  duration-200 hover:scale-110 hover:bg-accent active:scale-95"
           title="Back"
         >
           <ArrowLeft className="h-5 w-5" />

@@ -25,7 +25,7 @@ export const EditPostForm = ({ postId }: EditPostFormProps) => {
 
   // Fetch post data using oRPC pattern
   const { data: posts, isLoading: postsLoading } = useQuery(
-    orpc.post.getPosts.queryOptions(),
+    orpc.post.getPostsForAdmin.queryOptions(),
   );
   const post = posts?.find((p) => p.id === postId);
 

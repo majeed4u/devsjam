@@ -32,6 +32,11 @@ export type PostTypeAll = {
     name: string;
     slug: string;
   } | null;
+  series: {
+    id: string;
+    title: string;
+    slug: string;
+  } | null;
   id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -41,6 +46,7 @@ export type PostTypeAll = {
   content: string;
   coverImage: string | null;
   published: boolean;
+  archived: boolean;
   readingTime: number | null;
   views: number;
   authorId: string;

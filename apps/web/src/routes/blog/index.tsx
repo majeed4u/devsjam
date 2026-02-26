@@ -1,5 +1,6 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PostCard } from "@/components/post/post-card";
 import { PostCardGridSkeleton } from "@/components/skeletons/post-card-skeleton";
 import { orpc } from "@/utils/orpc";
@@ -9,64 +10,123 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogComponent() {
-  const { data: posts, isLoading } = useQuery(
+  const { data: posts = [], isLoading, isError, error } = useQuery(
     orpc.post.getPosts.queryOptions(),
   );
 
+  const { categories, tags, series } = useMemo(() => {
+    const catMap = new Map<string, { name: string; slug: string }>();
+    const tagMap = new Map<string, { name: string; slug: string }>();
+    const seriesMap = new Map<string, { title: string; slug: string }>();
+    for (const p of posts) {
+      if (p.category)
+        catMap.set(p.category.id, {
+          name: p.category.name,
+          slug: p.category.slug,
+        });
+      for (const t of p.tags ?? [])
+        tagMap.set(t.id, { name: t.name, slug: t.slug });
+      if (p.series)
+        seriesMap.set(p.series.id, {
+          title: p.series.title,
+          slug: p.series.slug,
+        });
+    }
+    return {
+      categories: Array.from(catMap.values()),
+      tags: Array.from(tagMap.values()),
+      series: Array.from(seriesMap.values()),
+    };
+  }, [posts]);
+
   return (
     <main className="min-h-screen">
-      {/* Header Section */}
-      <section className="mx-auto max-w-7xl space-y-12 px-4 py-12 sm:px-6 sm:py-16 lg:px-8 animate-fade-in">
-        <div className="space-y-4">
-          <h1 className="font-bold text-4xl sm:text-5xl">Blog Articles</h1>
-          <p className="text-foreground/70 text-xl">
-            Explore my latest thoughts on web development, software
-            architecture, and technology.
+      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <header className="mb-8">
+          <h1 className="font-semibold text-2xl text-foreground sm:text-3xl">
+            Blog
+          </h1>
+          <p className="mt-1 text-foreground/60 text-sm">
+            DevOps, infrastructure, CI/CD, and reliability — notes and how-tos.
           </p>
-        </div>
+        </header>
 
-        {/* Filter/Sort Options */}
-        <div
-          className="flex flex-wrap gap-2 animate-slide-in-up"
-          style={{ animationDelay: "0.1s" }}
+        {/* Filters by category, tag, series */}
+        <nav
+          className="mb-10 border-border/30 border-b pb-6"
+          aria-label="Filter posts"
         >
-          <button className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground text-sm transition-all duration-200 hover:bg-primary/90 hover:scale-105 active:scale-95">
-            All Posts
-          </button>
-          <button className="rounded-lg border border-border px-4 py-2 text-sm transition-all duration-200 hover:bg-accent hover:scale-105 active:scale-95">
-            Latest
-          </button>
-          <button className="rounded-lg border border-border px-4 py-2 text-sm transition-all duration-200 hover:bg-accent hover:scale-105 active:scale-95">
-            Most Popular
-          </button>
-        </div>
+          <p className="mb-3 text-foreground/60 text-xs uppercase tracking-wider">
+            Filter by
+          </p>
+          <div className="flex flex-wrap gap-4 text-sm">
+            {categories.length > 0 && (
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-foreground/50">Category:</span>
+                {categories.map((c) => (
+                  <Link
+                    key={c.slug}
+                    to="/blog/category/$category"
+                    params={{ category: c.name }}
+                    className="text-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
+                  >
+                    {c.name}
+                  </Link>
+                ))}
+              </span>
+            )}
+            {tags.length > 0 && (
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-foreground/50">Tag:</span>
+                {tags.map((t) => (
+                  <Link
+                    key={t.slug}
+                    to="/blog/tag/$tag"
+                    params={{ tag: t.name }}
+                    className="text-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
+                  >
+                    {t.name}
+                  </Link>
+                ))}
+              </span>
+            )}
+            {series.length > 0 && (
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-foreground/50">Series:</span>
+                {series.map((s) => (
+                  <Link
+                    key={s.slug}
+                    to="/blog/series/$series"
+                    params={{ series: s.slug }}
+                    className="text-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
+                  >
+                    {s.title}
+                  </Link>
+                ))}
+              </span>
+            )}
+          </div>
+        </nav>
       </section>
 
-      {/* Posts Grid */}
-      <section
-        className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8 animate-slide-in-up"
-        style={{ animationDelay: "0.2s" }}
-      >
+      <section className="mx-auto max-w-3xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
         {isLoading ? (
           <PostCardGridSkeleton count={6} />
         ) : posts && posts.length > 0 ? (
-          <div className="grid gap-6 md:gap-8">
-            {posts.map((post, idx) => (
-              <div
-                key={post.id}
-                className="animate-slide-in-up"
-                style={{ animationDelay: `${0.3 + idx * 0.05}s` }}
-              >
-                <PostCard post={post} />
-              </div>
+          <div className="space-y-8">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
+        ) : isError ? (
+          <p className="text-foreground/50 text-sm">
+            Couldn’t load posts. {error?.message ?? "Try again later."}
+          </p>
         ) : (
-          <div className="py-12 text-center">
-            <p className="text-foreground/60 text-lg">
-              No posts yet. Check back soon!
-            </p>
-          </div>
+          <p className="text-foreground/50 text-sm">
+            No posts yet. Create one in the admin or run the database seed for
+            sample data.
+          </p>
         )}
       </section>
     </main>

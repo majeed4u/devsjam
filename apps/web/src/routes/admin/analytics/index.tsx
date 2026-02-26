@@ -10,7 +10,7 @@ export const Route = createFileRoute("/admin/analytics/")({
 
 function AnalyticsComponent() {
   const { data: posts, isLoading } = useQuery(
-    orpc.post.getPosts.queryOptions(),
+    orpc.post.getPostsForAdmin.queryOptions(),
   );
 
   if (isLoading) {

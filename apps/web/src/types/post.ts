@@ -15,6 +15,12 @@ export interface Category {
   slug: string;
 }
 
+export interface Series {
+  id: string;
+  title: string;
+  slug: string;
+}
+
 export interface Post {
   id: string;
   title: string;
@@ -23,6 +29,7 @@ export interface Post {
   content: string;
   coverImage: string | null;
   published: boolean;
+  archived: boolean;
   readingTime: number | null;
   views: number;
   authorId: string;
@@ -33,5 +40,6 @@ export interface Post {
   updatedAt: Date;
   // Relations - these are always returned by oRPC but typed as optional for component flexibility
   category?: Category | null;
+  series?: Series | null;
   tags?: Tag[];
 }

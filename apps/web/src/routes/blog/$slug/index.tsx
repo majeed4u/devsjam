@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import { PostView } from "@/components/PostView";
 import { AuthorBio } from "@/components/post/author-bio";
 import { RelatedPosts } from "@/components/post/related-posts";
@@ -14,9 +13,8 @@ export const Route = createFileRoute("/blog/$slug/")({
 
 function BlogPostComponent() {
   const { slug } = useParams({ from: "/blog/$slug/" });
-  const { data: posts } = useQuery(orpc.post.getPosts.queryOptions());
-
-  const post = posts?.find(
+  const { data: posts = [] } = useQuery(orpc.post.getPosts.queryOptions());
+  const post = posts.find(
     (p) =>
       p.slug === slug || p.title.toLowerCase().replace(/\s+/g, "-") === slug,
   );
@@ -24,17 +22,17 @@ function BlogPostComponent() {
   if (!post) {
     return (
       <main className="min-h-screen">
-        <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="space-y-4 text-center">
-            <h1 className="font-bold text-4xl">Post Not Found</h1>
-            <p className="text-foreground/60">
+            <h1 className="font-semibold text-2xl text-foreground">Post not found</h1>
+            <p className="text-foreground/60 text-sm">
               The post you're looking for doesn't exist.
             </p>
             <Link
               to="/blog"
-              className="inline-block rounded-lg bg-primary px-6 py-2 font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/90"
+              className="text-foreground/70 text-sm hover:text-foreground hover:underline"
             >
-              Back to Blog
+              ← Back to Blog
             </Link>
           </div>
         </section>
@@ -48,27 +46,50 @@ function BlogPostComponent() {
     day: "numeric",
   });
 
-  // Filter out current post from related posts
-  const relatedPosts = posts?.filter((p) => p.id !== post.id) ?? [];
+  const relatedPosts = posts.filter((p) => p.id !== post.id);
   const postSlug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+
+  const seriesPosts = post.series
+    ? [...posts.filter((p) => p.series?.id === post.series?.id)].sort(
+        (a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0),
+      )
+    : [];
+  const seriesIndex = seriesPosts.findIndex((p) => p.id === post.id);
+  const prevInSeries = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
+  const nextInSeries =
+    seriesIndex >= 0 && seriesIndex < seriesPosts.length - 1
+      ? seriesPosts[seriesIndex + 1]
+      : null;
 
   return (
     <main className="min-h-screen">
-      {/* Back Navigation */}
-      <div className="mx-auto max-w-4xl px-4 pt-12 pb-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 pt-10 pb-4 sm:px-6 lg:px-8">
         <Link
           to="/blog"
-          className="group inline-flex items-center gap-1 text-primary transition-colors duration-200 hover:text-primary/80"
+          className="text-foreground/60 text-sm hover:text-foreground hover:underline"
         >
-          <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
-          Back to Blog
+          ← Blog
         </Link>
       </div>
 
-      {/* Post Header */}
-      <section className="mx-auto max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-3xl px-4 pb-10 sm:px-6 lg:px-8">
         <div className="space-y-6">
-          {/* Category/Tags */}
+          {post.series && (
+            <div className="text-foreground/60 text-sm">
+              <Link
+                to="/blog/series/$series"
+                params={{ series: post.series.slug }}
+                className="hover:text-foreground hover:underline"
+              >
+                Series: {post.series.title}
+              </Link>
+              {seriesPosts.length > 0 && (
+                <span className="ml-2">
+                  · Part {seriesIndex + 1} of {seriesPosts.length}
+                </span>
+              )}
+            </div>
+          )}
           <div className="flex flex-wrap gap-3">
             {post.category && (
               <Link
@@ -127,9 +148,8 @@ function BlogPostComponent() {
         </div>
       </section>
 
-      {/* Cover Image */}
       {post.coverImage && (
-        <section className="mx-auto max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-3xl px-4 pb-10 sm:px-6 lg:px-8">
           <div className="relative aspect-video overflow-hidden rounded-xl border border-border/30 bg-accent/30">
             <img
               src={post.coverImage}
@@ -140,32 +160,67 @@ function BlogPostComponent() {
         </section>
       )}
 
-      {/* Post Content */}
-      <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
         <PostView post={post} />
       </section>
 
-      {/* Divider */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="border-border/40 border-t" />
+      {(prevInSeries || nextInSeries) && (
+        <nav
+          className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 border-border/30 border-t"
+          aria-label="Series navigation"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+            {prevInSeries ? (
+              <Link
+                to="/blog/$slug"
+                params={{
+                  slug:
+                    prevInSeries.slug ||
+                    prevInSeries.title.toLowerCase().replace(/\s+/g, "-"),
+                }}
+                className="text-foreground/70 text-sm hover:text-foreground hover:underline"
+              >
+                ← {prevInSeries.title}
+              </Link>
+            ) : (
+              <span />
+            )}
+            {nextInSeries ? (
+              <Link
+                to="/blog/$slug"
+                params={{
+                  slug:
+                    nextInSeries.slug ||
+                    nextInSeries.title.toLowerCase().replace(/\s+/g, "-"),
+                }}
+                className="text-foreground/70 text-sm hover:text-foreground hover:underline sm:text-right"
+              >
+                {nextInSeries.title} →
+              </Link>
+            ) : (
+              <span />
+            )}
+          </div>
+        </nav>
+      )}
+
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div className="border-border/30 border-t" />
       </div>
 
-      {/* Author Bio */}
-      <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
         <AuthorBio
           name="Majed"
-          bio="Full-stack developer passionate about building scalable applications and sharing technical knowledge. Interested in web technologies, software architecture, and open source."
+          bio="DevOps and infrastructure. I write about CI/CD, Kubernetes, reliability, and making systems that stay up."
         />
       </section>
 
-      {/* Newsletter Signup */}
-      <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <SubscribeNewsletter />
       </section>
 
-      {/* Related Posts */}
       {relatedPosts.length > 0 && (
-        <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
           <RelatedPosts posts={relatedPosts} />
         </section>
       )}

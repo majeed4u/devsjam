@@ -31,7 +31,7 @@ export function BlogHeader() {
           : "border-transparent border-b bg-background/70"
       }`}
     >
-      <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 w-full max-w-4xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           to="/"
           className="font-medium text-foreground text-base hover:text-foreground/80"

@@ -14,7 +14,8 @@ function BlogPostComponent() {
   const { data: posts } = useQuery(orpc.post.getPosts.queryOptions());
 
   const post = posts?.find(
-    (p) => p.slug === slug || p.title.toLowerCase().replace(/\s+/g, "-") === slug
+    (p) =>
+      p.slug === slug || p.title.toLowerCase().replace(/\s+/g, "-") === slug,
   );
 
   if (!post) {

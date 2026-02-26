@@ -53,7 +53,8 @@ function RootComponent() {
   const location = useLocation();
 
   const isAdminRoute = location.pathname.startsWith("/admin");
-  const isAuthRoute = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthRoute =
+    location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>

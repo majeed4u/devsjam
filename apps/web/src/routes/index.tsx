@@ -8,7 +8,9 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  const { data: posts, isLoading } = useQuery(orpc.post.getPosts.queryOptions());
+  const { data: posts, isLoading } = useQuery(
+    orpc.post.getPosts.queryOptions(),
+  );
 
   return (
     <main className="w-full bg-gradient-to-b from-background via-background to-background/50">
@@ -22,7 +24,9 @@ function HomeComponent() {
               </span>
             </h1>
             <p className="text-lg sm:text-xl text-foreground/70 font-light leading-relaxed">
-              Sharing experiences, knowledge, and technical insights about web development, software architecture, and building products that matter.
+              Sharing experiences, knowledge, and technical insights about web
+              development, software architecture, and building products that
+              matter.
             </p>
           </div>
           <div className="flex gap-3 flex-wrap">
@@ -39,8 +43,12 @@ function HomeComponent() {
       {/* Latest Posts Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-2">Latest Articles</h2>
-          <p className="text-foreground/60">Thoughts on tech, development, and building better software</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-2">
+            Latest Articles
+          </h2>
+          <p className="text-foreground/60">
+            Thoughts on tech, development, and building better software
+          </p>
         </div>
 
         {isLoading && (
@@ -69,4 +77,3 @@ function HomeComponent() {
     </main>
   );
 }
-

@@ -37,7 +37,7 @@ export function BlogHeader() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <CommandIcon className="h-5 w-5" />
           </div>
-          <span className="hidden bg-gradient-to-r from-primary to-primary/60 bg-clip-text font-bold text-transparent sm:inline">
+          <span className="hidden bg-linear-to-r from-primary to-primary/60 bg-clip-text font-bold text-transparent sm:inline">
             DevJams
           </span>
         </Link>

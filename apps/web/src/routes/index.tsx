@@ -13,13 +13,13 @@ function HomeComponent() {
   );
 
   return (
-    <main className="w-full bg-gradient-to-b from-background via-background to-background/50">
+    <main className="w-full bg-linear-to-b from-background via-background to-background/50">
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div className="flex max-w-2xl flex-col gap-6">
           <div className="space-y-4">
             <h1 className="font-bold text-4xl tracking-tight sm:text-5xl lg:text-6xl">
-              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 DevJams
               </span>
             </h1>

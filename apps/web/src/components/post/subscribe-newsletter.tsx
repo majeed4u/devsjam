@@ -31,7 +31,7 @@ export function SubscribeNewsletter() {
 
   return (
     <section className="py-12">
-      <div className="rounded-lg border border-border/40 bg-gradient-to-r from-primary/10 to-primary/5 p-8 sm:p-12">
+      <div className="rounded-lg border border-border/40 bg-linear-to-r from-primary/10 to-primary/5 p-8 sm:p-12">
         <div className="mx-auto max-w-2xl text-center">
           <div className="mb-4 flex justify-center">
             <div className="rounded-lg bg-primary/20 p-3">

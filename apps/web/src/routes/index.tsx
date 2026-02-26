@@ -2,8 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { orpc } from "@/utils/orpc";
 import { BlogLayout } from "@/components/layout/blog-layout";
-import { FeaturedPostHero } from "@/components/blog/featured-post-hero";
-import { PostGrid } from "@/components/blog/post-grid";
+import { PersonalHero } from "@/components/blog/personal-hero";
+import { PersonalFeaturedPost } from "@/components/blog/personal-featured-post";
+import { PersonalPostsList } from "@/components/blog/personal-posts-list";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -17,24 +18,14 @@ function HomeComponent() {
 
   return (
     <BlogLayout>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <div className="mb-16">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl mb-4">
-            Welcome to DevJams
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            Exploring software development, technology, and sharing insights
-            from my journey as a developer.
-          </p>
-        </div>
+      {/* Personal Hero */}
+      <PersonalHero />
 
-        {/* Featured Post */}
-        {featuredPost && <FeaturedPostHero post={featuredPost as any} />}
+      {/* Featured Post */}
+      {featuredPost && <PersonalFeaturedPost post={featuredPost as any} />}
 
-        {/* Other Posts Grid */}
-        {otherPosts.length > 0 && <PostGrid posts={otherPosts as any} />}
-      </div>
+      {/* Latest Posts */}
+      {otherPosts.length > 0 && <PersonalPostsList posts={otherPosts as any} />}
     </BlogLayout>
   );
 }

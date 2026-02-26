@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { PostCard } from "@/components/post/post-card";
 import { orpc } from "@/utils/orpc";
 
@@ -30,12 +31,20 @@ function HomeComponent() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="rounded-lg bg-primary px-6 py-2 font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/90">
+            <Link
+              to="/blog/"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-all duration-200 hover:bg-primary/90 hover:scale-105"
+            >
               Explore Posts
-            </button>
-            <button className="rounded-lg border border-border px-6 py-2 transition-colors duration-200 hover:bg-accent">
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 transition-all duration-200 hover:bg-accent hover:scale-105"
+            >
               Learn More
-            </button>
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
       </section>

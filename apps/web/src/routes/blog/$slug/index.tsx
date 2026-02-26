@@ -1,16 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useParams } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { orpc } from "@/utils/orpc";
 import { PostView } from "@/components/PostView";
+import { AuthorBio } from "@/components/post/author-bio";
+import { RelatedPosts } from "@/components/post/related-posts";
+import { SocialShare } from "@/components/post/social-share";
+import { SubscribeNewsletter } from "@/components/post/subscribe-newsletter";
+import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/$slug/")({
   component: BlogPostComponent,
 });
 
 function BlogPostComponent() {
-  const { slug } = useParams({ from: "/blog/$slug" });
+  const { slug } = useParams({ from: "/blog/$slug/" });
   const { data: posts } = useQuery(orpc.post.getPosts.queryOptions());
 
   const post = posts?.find(
@@ -21,15 +24,15 @@ function BlogPostComponent() {
   if (!post) {
     return (
       <main className="min-h-screen">
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold">Post Not Found</h1>
+        <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <div className="space-y-4 text-center">
+            <h1 className="font-bold text-4xl">Post Not Found</h1>
             <p className="text-foreground/60">
               The post you're looking for doesn't exist.
             </p>
             <Link
               to="/blog"
-              className="inline-block px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors duration-200"
+              className="inline-block rounded-lg bg-primary px-6 py-2 font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/90"
             >
               Back to Blog
             </Link>
@@ -45,75 +48,127 @@ function BlogPostComponent() {
     day: "numeric",
   });
 
+  // Filter out current post from related posts
+  const relatedPosts = posts?.filter((p) => p.id !== post.id) ?? [];
+  const postSlug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+
   return (
     <main className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6">
+      {/* Back Navigation */}
+      <div className="mx-auto max-w-4xl px-4 pt-12 pb-6 sm:px-6 lg:px-8">
         <Link
           to="/blog"
-          className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors duration-200 group"
+          className="group inline-flex items-center gap-1 text-primary transition-colors duration-200 hover:text-primary/80"
         >
-          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
+          <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
           Back to Blog
         </Link>
       </div>
 
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      {/* Post Header */}
+      <section className="mx-auto max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
         <div className="space-y-6">
+          {/* Category/Tags */}
           <div className="flex flex-wrap gap-3">
-            {post.categoryId && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
-                Technology
-              </span>
+            {post.category && (
+              <Link
+                to="/blog/category/$category"
+                params={{ category: post.category.name }}
+                className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors duration-200 hover:bg-primary/20"
+              >
+                {post.category.name}
+              </Link>
+            )}
+            {post.tags && post.tags.length > 0 && (
+              <>
+                {post.tags.map((tag) => (
+                  <Link
+                    key={tag.id}
+                    to="/blog/tag/$tag"
+                    params={{ tag: tag.name }}
+                    className="rounded-full bg-accent/50 px-3 py-1 font-medium text-foreground/70 text-sm transition-colors duration-200 hover:bg-accent"
+                  >
+                    {tag.name}
+                  </Link>
+                ))}
+              </>
             )}
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+          {/* Title */}
+          <h1 className="font-bold text-4xl leading-tight sm:text-5xl lg:text-6xl">
             {post.title}
           </h1>
 
-          <p className="text-lg sm:text-xl text-foreground/70 leading-relaxed max-w-2xl">
+          {/* Excerpt */}
+          <p className="max-w-2xl text-foreground/70 text-lg leading-relaxed sm:text-xl">
             {post.excerpt}
           </p>
 
-          <div className="flex flex-wrap gap-4 text-sm text-foreground/60 pt-4 border-t border-border/40">
-            <div>
-              <span className="font-medium">Published:</span> {publishDate}
+          {/* Post Meta and Share */}
+          <div className="space-y-4 border-border/40 border-t pt-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap gap-4 text-foreground/60 text-sm">
+                <div>
+                  <span className="font-medium">Published:</span> {publishDate}
+                </div>
+                <div>
+                  <span className="font-medium">Reading Time:</span>{" "}
+                  {post.readingTime} min
+                </div>
+              </div>
             </div>
-            <div>
-              <span className="font-medium">Reading Time:</span>{" "}
-              {post.readingTime} min
-            </div>
+            <SocialShare
+              title={post.title}
+              slug={postSlug}
+              excerpt={post.excerpt ?? undefined}
+            />
           </div>
         </div>
       </section>
 
+      {/* Cover Image */}
       {post.coverImage && (
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-          <div className="relative aspect-video rounded-xl overflow-hidden bg-accent/30 border border-border/30">
+        <section className="mx-auto max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
+          <div className="relative aspect-video overflow-hidden rounded-xl border border-border/30 bg-accent/30">
             <img
               src={post.coverImage}
               alt={post.title}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           </div>
         </section>
       )}
 
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <PostView post={post as any} />
+      {/* Post Content */}
+      <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <PostView post={post} />
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="rounded-lg border border-border/40 bg-card/50 p-8 text-center">
-          <h3 className="text-2xl font-bold mb-2">Enjoyed this post?</h3>
-          <p className="text-foreground/60 mb-6">
-            Subscribe to get notified about new articles and insights.
-          </p>
-          <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors duration-200">
-            Subscribe
-          </button>
-        </div>
+      {/* Divider */}
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div className="border-border/40 border-t" />
+      </div>
+
+      {/* Author Bio */}
+      <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <AuthorBio
+          name="Majed"
+          bio="Full-stack developer passionate about building scalable applications and sharing technical knowledge. Interested in web technologies, software architecture, and open source."
+        />
       </section>
+
+      {/* Newsletter Signup */}
+      <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <SubscribeNewsletter />
+      </section>
+
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+          <RelatedPosts posts={relatedPosts} />
+        </section>
+      )}
     </main>
   );
 }

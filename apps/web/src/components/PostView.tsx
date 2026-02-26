@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createHighlighter } from "shiki";
-import type { Post } from "../../../../packages/db/prisma/generated/client";
+import type { Post } from "@/types/post";
 
 export const PostView = ({ post }: { post: Post }) => {
   const [html, setHtml] = useState(post.content);

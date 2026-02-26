@@ -35,15 +35,16 @@ export function SubscribeNewsletter() {
               <Mail className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold mb-2">
-            Stay Updated
-          </h3>
+          <h3 className="text-2xl sm:text-3xl font-bold mb-2">Stay Updated</h3>
           <p className="text-foreground/60 mb-6">
             Subscribe to get the latest articles and insights delivered to your
             inbox.
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row gap-2"
+          >
             <input
               type="email"
               placeholder="your@email.com"

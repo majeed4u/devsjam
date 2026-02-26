@@ -10,8 +10,7 @@ interface SocialShareProps {
 
 export function SocialShare({ title, slug, excerpt }: SocialShareProps) {
   const [copied, setCopied] = useState(false);
-  const baseUrl =
-    typeof window !== "undefined" ? window.location.origin : "";
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const postUrl = `${baseUrl}/blog/${slug}`;
 
   const handleCopy = async () => {

@@ -20,7 +20,8 @@ export function RelatedPosts({ posts, limit = 3 }: RelatedPostsProps) {
       <h3 className="text-2xl font-bold mb-8">Related Articles</h3>
       <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
         {displayPosts.map((post) => {
-          const slug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+          const slug =
+            post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
           return (
             <Link
               key={post.id}

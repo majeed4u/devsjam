@@ -101,7 +101,11 @@ function BlogPostComponent() {
                 </div>
               </div>
             </div>
-            <SocialShare title={post.title} slug={postSlug} excerpt={post.excerpt} />
+            <SocialShare
+              title={post.title}
+              slug={postSlug}
+              excerpt={post.excerpt}
+            />
           </div>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import { NewPostForm } from "@/components/post/new-post-form";
+import { EnhancedPostForm } from "@/components/admin/enhanced-post-form";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/post/new/")({
@@ -6,5 +6,5 @@ export const Route = createFileRoute("/admin/post/new/")({
 });
 
 function RouteComponent() {
-  return <NewPostForm />;
+  return <EnhancedPostForm />;
 }

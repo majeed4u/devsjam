@@ -50,6 +50,54 @@ const app = new Elysia()
       credentials: true,
     }),
   )
+  // Media route - must come before generic wildcard routes
+  .get("/media/*", async ({ params, status, request }) => {
+    try {
+      const encodedKey = params["*"];
+      // Decode URL-encoded key (handles spaces, special characters, etc.)
+      const key = decodeURIComponent(encodedKey);
+
+      console.log("Media request received:", {
+        encodedKey,
+        key,
+        url: request.url,
+        method: request.method,
+      });
+
+      if (!key) {
+        console.error("No key provided in media request");
+        return status(400, "No key provided");
+      }
+
+      const { buffer, contentType } = await getFile(key);
+      console.log(
+        "Successfully fetched file:",
+        key,
+        "contentType:",
+        contentType,
+        "buffer size:",
+        buffer.length,
+      );
+
+      return new Response(buffer, {
+        status: 200,
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "public, max-age=31536000, immutable",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET",
+          "Cross-Origin-Resource-Policy": "cross-origin",
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching media file:", {
+        error: error instanceof Error ? error.message : String(error),
+        key: params["*"],
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return status(404, "File not found");
+    }
+  })
   .all("/api/auth/*", async (context) => {
     const { request, status } = context;
     if (["POST", "GET"].includes(request.method)) {
@@ -70,28 +118,6 @@ const app = new Elysia()
       context: await createContext({ context }),
     });
     return response ?? new Response("Not Found", { status: 404 });
-  })
-  .get("/media/:path*", async ({ params, status }) => {
-    try {
-      const key = params["path*"];
-      console.log("Media request for key:", key);
-      const { buffer, contentType } = await getFile(key);
-      console.log(
-        "Successfully fetched file:",
-        key,
-        "contentType:",
-        contentType,
-      );
-      return new Response(buffer, {
-        headers: {
-          "Content-Type": contentType,
-          "Cache-Control": "public, max-age=31536000, immutable",
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching media file:", error);
-      return status(404);
-    }
   })
   .get("/", () => "OK - DevJams - Server")
   .use(logger())

@@ -79,7 +79,7 @@ export const uploadFile = async ({
 
   return {
     key,
-    url: `${env.SERVER_URL}/media/${key}`,
+    url: `${env.SERVER_URL}/media/${encodeURIComponent(key)}`,
   };
 };
 

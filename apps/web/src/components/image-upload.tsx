@@ -83,9 +83,11 @@ export const ImageUpload = ({ form, label, name }: ImageUploadProps) => {
 				setProgress(100);
 				setState("done");
 
-				form.setValue(name, files[0].url, { shouldValidate: true });
+				const uploadedUrl = files[0].url;
+				console.log("Upload successful, URL:", uploadedUrl);
+				form.setValue(name, uploadedUrl, { shouldValidate: true });
 				URL.revokeObjectURL(localPreview);
-				setPreview(files[0].url);
+				setPreview(uploadedUrl);
 			} catch (e: any) {
 				setState("error");
 				setProgress(0);
@@ -152,6 +154,17 @@ export const ImageUpload = ({ form, label, name }: ImageUploadProps) => {
 							<img
 								src={preview}
 								alt="preview"
+								onError={(e) => {
+									console.error("Image load error:", {
+										src: preview,
+										error: e,
+									});
+									const target = e.target as HTMLImageElement;
+									target.style.display = "none";
+								}}
+								onLoad={() => {
+									console.log("Image loaded successfully:", preview);
+								}}
 								className={[
 									"absolute inset-0 h-full w-full object-cover transition-opacity duration-300",
 									isLoading ? "opacity-40" : "opacity-100",

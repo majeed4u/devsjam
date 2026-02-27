@@ -2,33 +2,44 @@ import { Link } from "@tanstack/react-router";
 import { Calendar, Clock, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQueryState } from "nuqs";
+import {
+	createStandardSchemaV1,
+	parseAsString,
+	useQueryStates,
+} from "nuqs";
 import { orpc } from "@/utils/orpc";
 import { PostCard } from "@/components/post/post-card";
 
+const searchParams = {
+	q: parseAsString.withDefault(""),
+	category: parseAsString.withDefault(""),
+	tags: parseAsString.withDefault(""),
+	series: parseAsString.withDefault(""),
+};
+
 export const Route = createFileRoute("/search/")({
-  component: SearchPage,
+	component: SearchPage,
+	validateSearch: createStandardSchemaV1(searchParams, {
+		partialOutput: true,
+	}),
 });
 
 function SearchPage() {
-  const [query, setQuery] = useQueryState("q", { defaultValue: "" });
-  const [category, setCategory] = useQueryState("category");
-  const [tags, setTags] = useQueryState("tags");
-  const [series, setSeries] = useQueryState("series");
+	const [{ q, category, tags, series }, setSearch] = useQueryStates(searchParams);
 
-  const hasFilters = Boolean(query || category || tags || series);
+	const hasFilters = Boolean(q || category || tags || series);
 
-  const { data: searchResults, isLoading, isError } = useQuery(
-    orpc.post.search.queryOptions({
-      input: {
-        query: query || undefined,
-        categoryId: category || undefined,
-        tagIds: tags ? tags.split(",").filter(Boolean) : undefined,
-        seriesId: series || undefined,
-        limit: 20,
-      },
-    }),
-  );
+	const { data: searchResults, isLoading, isError } = useQuery(
+		orpc.post.search.queryOptions({
+			input: {
+				query: q || undefined,
+				categoryId: category || undefined,
+				tagIds: tags ? tags.split(",").filter(Boolean) : undefined,
+				seriesId: series || undefined,
+				limit: 20,
+			},
+		}),
+	);
 
   return (
     <main className="min-h-screen">
@@ -82,8 +93,8 @@ function SearchPage() {
                   {searchResults.total}
                 </span>{" "}
                 result{searchResults.total !== 1 ? "s" : ""}{" "}
-                {query && (
-                  <>for "<span className="font-semibold text-foreground">"{query}"</span></>
+                {q && (
+                  <>for "<span className="font-semibold text-foreground">"{q}"</span></>
                 )}
                 {(category || tags || series) && (
                   <span className="ml-2 text-xs text-foreground/40">

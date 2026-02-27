@@ -10,13 +10,28 @@ export const Route = createFileRoute("/blog/$slug/")({
 
 function BlogPostComponent() {
   const { slug } = useParams({ from: "/blog/$slug/" });
-  const { data: posts = [] } = useQuery(orpc.post.getPosts.queryOptions());
-  const post = posts.find(
-    (p) =>
-      p.slug === slug || p.title.toLowerCase().replace(/\s+/g, "-") === slug,
+
+  // Use the new getBySlug endpoint - much more efficient!
+  const { data: post, isLoading, isError } = useQuery(
+    orpc.post.getBySlug.queryOptions({ input: { slug } }),
   );
 
-  if (!post) {
+  // Still fetch all posts for sidebar/series navigation (cached by React Query)
+  const { data: posts = [] } = useQuery(orpc.post.getPosts.queryOptions());
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen">
+        <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (isError || !post) {
     return (
       <main className="min-h-screen">
         <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">

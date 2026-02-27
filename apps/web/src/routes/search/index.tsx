@@ -22,20 +22,19 @@ function SearchPage() {
   const { q: query, category, tags, series } = Route.useSearch();
   const navigate = useNavigate();
 
-  const hasFilters = query || category || (tags && tags.length > 0) || series;
+  const hasFilters = Boolean(query || category || (tags && tags.length > 0) || series);
 
-  const { data: searchResults, isLoading, isError } = useQuery({
-    ...orpc.post.search.queryOptions({
+  const { data: searchResults, isLoading, isError } = useQuery(
+    orpc.post.search.queryOptions({
       input: {
         query,
-        categoryId: category,
-        tagIds: tags,
-        seriesId: series,
+        categoryId: category || undefined,
+        tagIds: tags && tags.length > 0 ? tags : undefined,
+        seriesId: series || undefined,
         limit: 20,
       },
     }),
-    enabled: hasFilters,
-  });
+  );
 
   return (
     <main className="min-h-screen">

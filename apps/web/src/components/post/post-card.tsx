@@ -7,13 +7,16 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const publishDate = new Date(post.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  // Use backend-computed fields if available, fallback to frontend calculation
+  const publishDate = (post as any).formattedDate ||
+    new Date(post.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-  const slug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+  const slug = (post as any).slugUrl ||
+    post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
   const categoryName = post.category?.name;
 
   // Debug: Log cover image data

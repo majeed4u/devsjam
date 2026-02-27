@@ -19,6 +19,16 @@ function BlogPostComponent() {
   // Still fetch all posts for sidebar/series navigation (cached by React Query)
   const { data: posts = [] } = useQuery(orpc.post.getPosts.queryOptions());
 
+  // Use the new getSeriesNavigation endpoint
+  const { data: seriesNav } = useQuery(
+    orpc.post.getSeriesNavigation.queryOptions({
+      input: { postId: post?.id || "" },
+    }),
+    {
+      enabled: !!post?.seriesId, // Only fetch if post has a series
+    },
+  );
+
   if (isLoading) {
     return (
       <main className="min-h-screen">
@@ -61,26 +71,21 @@ function BlogPostComponent() {
     coverImage: post.coverImage,
   });
 
-  const publishDate = new Date(post.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  // Use backend-computed fields if available, fallback to frontend calculation
+  const publishDate = (post as any).formattedDate ||
+    new Date(post.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
   const relatedPosts = posts.filter((p) => p.id !== post.id);
-  const postSlug = post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
+  const postSlug = (post as any).slugUrl ||
+    post.slug || post.title.toLowerCase().replace(/\s+/g, "-");
 
-  const seriesPosts = post.series
-    ? [...posts.filter((p) => p.series?.id === post.series?.id)].sort(
-        (a, b) => (a.seriesOrder ?? 0) - (b.seriesOrder ?? 0),
-      )
-    : [];
-  const seriesIndex = seriesPosts.findIndex((p) => p.id === post.id);
-  const prevInSeries = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
-  const nextInSeries =
-    seriesIndex >= 0 && seriesIndex < seriesPosts.length - 1
-      ? seriesPosts[seriesIndex + 1]
-      : null;
+  // Use backend-provided series navigation if available
+  const prevInSeries = seriesNav?.prev || null;
+  const nextInSeries = seriesNav?.next || null;
 
   // Extract all unique tags, categories, and series for sidebar filters
   const allTags = posts.reduce(

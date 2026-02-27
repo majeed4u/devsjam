@@ -2,6 +2,7 @@ import prisma from "@devjams/db";
 import type { RouterClient } from "@orpc/server";
 import { z } from "zod";
 import { protectedProcedure, publicProcedure } from "../index";
+import { cacheDeletePattern, cacheGet, cacheSet } from "../lib/cache";
 import { calculateReadingTime } from "../lib/calculateReadingTime";
 import { generateUniqueSlug } from "../lib/generateUniqueSlug";
 import { postCreateSchema, postUpdateSchema } from "../lib/types";
@@ -21,13 +22,45 @@ function mapPosts<
   }));
 }
 
+/**
+ * Transform post with computed fields for frontend
+ * Moves frontend processing to backend for better performance
+ */
+function transformPost<T extends {
+  tags: { tag: { id: string; name: string; slug: string } }[];
+  createdAt: string | Date;
+  slug: string | null;
+  title: string;
+}>(post: T) {
+  return {
+    ...post,
+    tags: post.tags.map((t) => t.tag),
+    // Computed fields - move frontend processing to backend
+    formattedDate: new Date(post.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+    slugUrl: post.slug || post.title.toLowerCase().replace(/\s+/g, "-"),
+  };
+}
+
 export const postRouter = {
   getPosts: publicProcedure.handler(async () => {
+    // Try cache first
+    const cacheKey = "posts:published";
+    const cached = await cacheGet(cacheKey);
+    if (cached) return cached;
+
+    // Cache miss - fetch from database
     const posts = await prisma.post.findMany({
       where: { published: true, archived: false },
       include: postInclude,
     });
-    return mapPosts(posts);
+
+    const result = mapPosts(posts).map(transformPost);
+    await cacheSet(cacheKey, result, 300); // 5 minutes cache
+    return result;
   }),
 
   getPostsForAdmin: protectedProcedure.handler(async () => {
@@ -37,10 +70,14 @@ export const postRouter = {
     return mapPosts(posts);
   }),
 
-  // New: Get single post by slug - much more efficient than fetching all posts
+  // Get single post by slug with caching
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .handler(async ({ input }) => {
+      const cacheKey = `post:slug:${input.slug}`;
+      const cached = await cacheGet(cacheKey);
+      if (cached) return cached;
+
       const post = await prisma.post.findFirst({
         where: {
           slug: input.slug,
@@ -54,7 +91,92 @@ export const postRouter = {
         throw new Error("Post not found");
       }
 
-      return { ...post, tags: post.tags.map((t) => t.tag) };
+      const result = transformPost(post);
+      await cacheSet(cacheKey, result, 600); // 10 minutes cache
+      return result;
+    }),
+
+  // Get metadata for filters (categories, tags, series) with post counts
+  getMetadata: publicProcedure.handler(async () => {
+    const cacheKey = "posts:metadata";
+    const cached = await cacheGet(cacheKey);
+    if (cached) return cached;
+
+    const [categories, tags, series] = await Promise.all([
+      prisma.category.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          _count: { select: { posts: true } },
+        },
+      }),
+      prisma.tag.findMany({
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          _count: { select: { posts: true } },
+        },
+      }),
+      prisma.series.findMany({
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          _count: { select: { posts: true } },
+        },
+      }),
+    ]);
+
+    const result = { categories, tags, series };
+    await cacheSet(cacheKey, result, 600); // 10 minutes cache
+    return result;
+  }),
+
+  // Get series navigation (prev/next post in series)
+  getSeriesNavigation: publicProcedure
+    .input(z.object({ postId: z.string() }))
+    .handler(async ({ input }) => {
+      const cacheKey = `series:nav:${input.postId}`;
+      const cached = await cacheGet(cacheKey);
+      if (cached) return cached;
+
+      const post = await prisma.post.findUnique({
+        where: { id: input.postId },
+        select: { seriesId: true, seriesOrder: true },
+      });
+
+      if (!post?.seriesId) {
+        return null;
+      }
+
+      const [prev, next] = await Promise.all([
+        prisma.post.findFirst({
+          where: {
+            seriesId: post.seriesId,
+            seriesOrder: { lt: post.seriesOrder ?? 0 },
+            published: true,
+            archived: false,
+          },
+          orderBy: { seriesOrder: "desc" },
+          select: { id: true, title: true, slug: true },
+        }),
+        prisma.post.findFirst({
+          where: {
+            seriesId: post.seriesId,
+            seriesOrder: { gt: post.seriesOrder ?? 0 },
+            published: true,
+            archived: false,
+          },
+          orderBy: { seriesOrder: "asc" },
+          select: { id: true, title: true, slug: true },
+        }),
+      ]);
+
+      const result = { prev, next };
+      await cacheSet(cacheKey, result, 300); // 5 minutes cache
+      return result;
     }),
 
   create: protectedProcedure
@@ -91,6 +213,11 @@ export const postRouter = {
           authorId: context.session?.user.id!,
         },
       });
+
+      // Invalidate cache when post is created
+      await cacheDeletePattern("posts:");
+      await cacheDeletePattern("post:");
+
       return posts;
     }),
 
@@ -147,6 +274,11 @@ export const postRouter = {
         data: updateData,
         include: postInclude,
       });
+
+      // Invalidate cache when post is updated
+      await cacheDeletePattern("posts:");
+      await cacheDeletePattern("post:");
+
       return { ...post, tags: post.tags.map((t) => t.tag) };
     }),
 };

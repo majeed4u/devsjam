@@ -18,15 +18,12 @@ export const Route = createFileRoute("/search/")({
 function SearchPage() {
   const { q: query } = Route.useSearch();
 
-  const { data: searchResults, isLoading, isError } = useQuery(
-    // @ts-ignore - search endpoint may not be typed yet
-    orpc.post.search.queryOptions({
+  const { data: searchResults, isLoading, isError } = useQuery({
+    ...orpc.post.search.queryOptions({
       input: { query: query || "", limit: 20 },
     }),
-    {
-      enabled: !!query && query.length >= 2,
-    },
-  );
+    enabled: !!query && query.length >= 2,
+  });
 
   return (
     <main className="min-h-screen">

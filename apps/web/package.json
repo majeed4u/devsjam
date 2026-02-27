@@ -23,6 +23,7 @@
 		"@orpc/client": "catalog:",
 		"@orpc/server": "catalog:",
 		"@orpc/tanstack-query": "^1.12.2",
+		"@plausible-analytics/tracker": "^0.4.4",
 		"@prisma/client": "catalog:",
 		"@tailwindcss/vite": "^4.0.15",
 		"@tanstack/react-form": "^1.28.0",

@@ -8,7 +8,7 @@ export const PostView = ({ post }: { post: Post }) => {
   useEffect(() => {
     async function highlight() {
       const highlighter = await createHighlighter({
-        themes: ["material-theme-darker"],
+        themes: ["dracula-soft"],
         langs: ["ts", "js", "tsx", "jsx", "yaml", "sh", "html", "bash"],
       });
 
@@ -32,7 +32,7 @@ export const PostView = ({ post }: { post: Post }) => {
             .replace(/&amp;/g, "&");
           return highlighter.codeToHtml(decoded, {
             lang: lang || "text",
-            theme: "material-theme-darker",
+            theme: "dracula-soft",
           });
         },
       );

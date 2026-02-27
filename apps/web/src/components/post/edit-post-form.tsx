@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Save } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useEffect } from "react";
 import { orpc } from "@/utils/orpc";
 import { TipTapsEditor } from "../editor/tiptaps-editor";
 import { FormCreatableSelect } from "../form-creatable-select";
@@ -29,6 +30,9 @@ export const EditPostForm = ({ postId }: EditPostFormProps) => {
   );
   const post = posts?.find((p) => p.id === postId);
 
+  // Debug: Log post data
+  console.log("Edit post data:", post);
+
   const { data: postCategories, isLoading: categoriesLoading } = useQuery(
     orpc.category.gets.queryOptions(),
   );
@@ -36,13 +40,7 @@ export const EditPostForm = ({ postId }: EditPostFormProps) => {
     orpc.series.gets.queryOptions(),
   );
 
-  const updatePost = useMutation({
-    mutationFn: async (data: PostCreateInput) => {
-      // TODO: Implement update mutation in backend
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return data;
-    },
-  });
+  const updatePost = useMutation(orpc.post.update.mutationOptions());
 
   const createCategory = useMutation(orpc.category.create.mutationOptions());
   const createSeries = useMutation(orpc.series.create.mutationOptions());
@@ -51,17 +49,34 @@ export const EditPostForm = ({ postId }: EditPostFormProps) => {
   const form = useForm<PostCreateInput>({
     resolver: zodResolver(postCreateSchema),
     defaultValues: {
-      title: post?.title ?? "",
-      excerpt: post?.excerpt ?? "",
-      content: post?.content ?? "",
-      coverImage: post?.coverImage ?? "",
-      readingTime: post?.readingTime ?? 0,
-      categoryId: post?.categoryId ?? undefined,
-      seriesId: post?.seriesId ?? undefined,
-      tags: post?.tags?.map((t) => t.slug) ?? [],
-      seriesOrder: post?.seriesOrder ?? undefined,
+      title: "",
+      excerpt: "",
+      content: "",
+      coverImage: "",
+      readingTime: 0,
+      categoryId: undefined,
+      seriesId: undefined,
+      tags: [],
+      seriesOrder: undefined,
     },
   });
+
+  // Reset form when post data loads
+  useEffect(() => {
+    if (post) {
+      form.reset({
+        title: post.title ?? "",
+        excerpt: post.excerpt ?? "",
+        content: post.content ?? "",
+        coverImage: post.coverImage ?? "",
+        readingTime: post.readingTime ?? 0,
+        categoryId: post.categoryId ?? undefined,
+        seriesId: post.seriesId ?? undefined,
+        tags: post.tags?.map((t) => t.slug) ?? [],
+        seriesOrder: post.seriesOrder ?? undefined,
+      });
+    }
+  }, [post, form]);
 
   const categories =
     postCategories?.map((c) => ({ value: c.id, label: c.name })) ?? [];
@@ -73,15 +88,18 @@ export const EditPostForm = ({ postId }: EditPostFormProps) => {
 
   async function onSubmit(data: PostCreateInput) {
     try {
-      await updatePost.mutateAsync(data, {
-        onSuccess() {
-          toast.success("Post updated successfully!");
-          navigate({ to: "/admin/post/published" });
+      await updatePost.mutateAsync(
+        { id: postId, ...data },
+        {
+          onSuccess() {
+            toast.success("Post updated successfully!");
+            navigate({ to: "/admin/post/published" });
+          },
+          onError(error) {
+            toast.error("Failed to update post: " + error.message);
+          },
         },
-        onError(error) {
-          toast.error("Failed to update post: " + error.message);
-        },
-      });
+      );
     } catch (error) {
       if (error instanceof ORPCError) {
         toast.error("Failed to update post: " + error.message);

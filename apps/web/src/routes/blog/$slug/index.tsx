@@ -19,25 +19,32 @@ function BlogPostComponent() {
   if (!post) {
     return (
       <main className="min-h-screen">
-         <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-           <div className="space-y-4 text-center">
-             <h1 className="font-semibold text-2xl text-foreground">
-               Post not found
-             </h1>
-             <p className="text-foreground/60 text-sm">
-               The post you're looking for doesn't exist.
-             </p>
-             <Link
-               to="/blog"
-               className="text-foreground/70 text-sm hover:text-foreground hover:underline"
-             >
-               ← Back to Blog
-             </Link>
-           </div>
-         </section>
+        <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="space-y-4 text-center">
+            <h1 className="font-semibold text-2xl text-foreground">
+              Post not found
+            </h1>
+            <p className="text-foreground/60 text-sm">
+              The post you're looking for doesn't exist.
+            </p>
+            <Link
+              to="/blog"
+              className="text-foreground/70 text-sm hover:text-foreground hover:underline"
+            >
+              ← Back to Blog
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }
+
+  // Debug: Log cover image data
+  console.log("Post data:", {
+    id: post.id,
+    title: post.title,
+    coverImage: post.coverImage,
+  });
 
   const publishDate = new Date(post.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -65,7 +72,12 @@ function BlogPostComponent() {
     (acc, post) => {
       post.tags?.forEach((tag) => {
         if (!acc.find((t) => t.id === tag.id)) {
-          acc.push({ ...tag, _count: { posts: 0 } });
+          acc.push({
+            id: tag.id,
+            name: tag.name,
+            slug: tag.slug,
+            _count: { posts: 0 },
+          });
         }
       });
       return acc;
@@ -156,6 +168,26 @@ function BlogPostComponent() {
         <div className="space-y-8">
           {/* Main content */}
           <div className="space-y-10">
+            {/* Cover Image - Hero style at the top */}
+            {post.coverImage && (
+              <section className="mb-8">
+                <div className="group relative aspect-video w-full overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl">
+                  <img
+                    src={post.coverImage}
+                    alt={post.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="eager"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.parentElement?.classList.add("hidden");
+                    }}
+                  />
+                  {/* Subtle gradient overlay for depth */}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                </div>
+              </section>
+            )}
+
             <section className="space-y-6">
               {post.series && (
                 <div className="text-foreground/60 text-sm">
@@ -231,18 +263,6 @@ function BlogPostComponent() {
               </div>
             </section>
 
-            {post.coverImage && (
-              <section>
-                <div className="relative aspect-video overflow-hidden rounded-xl border border-border/30 bg-accent/30">
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </section>
-            )}
-
             <section>
               <PostView post={post} />
             </section>
@@ -286,8 +306,8 @@ function BlogPostComponent() {
                 </div>
               </nav>
             )}
-           </div>
-         </div>
+          </div>
+        </div>
       </div>
     </main>
   );

@@ -150,35 +150,72 @@ export const postRouter = {
       return { ...post, tags: post.tags.map((t) => t.tag) };
     }),
 
-  // Full-text search across posts
+  // Search posts with filters
   search: publicProcedure
     .input(
       z.object({
-        query: z.string().min(2),
+        query: z.string().optional(),
+        categoryId: z.string().optional(),
+        tagIds: z.array(z.string()).optional(),
+        seriesId: z.string().optional(),
         limit: z.number().min(1).max(50).optional().default(10),
+        offset: z.number().min(0).optional().default(0),
       }),
     )
     .handler(async ({ input }) => {
-      const { query, limit } = input;
+      const { query, categoryId, tagIds, seriesId, limit, offset } = input;
 
-      // Simple ILIKE search (works without full-text search setup)
-      const posts = await prisma.post.findMany({
-        where: {
-          published: true,
-          archived: false,
-          OR: [
-            { title: { contains: query, mode: "insensitive" } },
-            { excerpt: { contains: query, mode: "insensitive" } },
-            { content: { contains: query, mode: "insensitive" } },
-          ],
-        },
-        include: postInclude,
-        take: limit,
-      });
+      // Build where clause
+      const where: any = {
+        published: true,
+        archived: false,
+      };
+
+      // Text search in title, excerpt, or content
+      if (query && query.length >= 2) {
+        where.OR = [
+          { title: { contains: query, mode: "insensitive" } },
+          { excerpt: { contains: query, mode: "insensitive" } },
+          { content: { contains: query, mode: "insensitive" } },
+        ];
+      }
+
+      // Filter by category
+      if (categoryId) {
+        where.categoryId = categoryId;
+      }
+
+      // Filter by series
+      if (seriesId) {
+        where.seriesId = seriesId;
+      }
+
+      // Filter by tags (AND logic - must have all specified tags)
+      if (tagIds && tagIds.length > 0) {
+        where.tags = {
+          some: {
+            tagId: { in: tagIds },
+          },
+        };
+      }
+
+      const [posts, total] = await Promise.all([
+        prisma.post.findMany({
+          where,
+          include: postInclude,
+          take: limit,
+          skip: offset,
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.post.count({ where }),
+      ]);
 
       return {
         results: mapPosts(posts),
-        method: "ilike",
+        total,
+        limit,
+        offset,
+        hasMore: offset + posts.length < total,
       };
     }),
 };

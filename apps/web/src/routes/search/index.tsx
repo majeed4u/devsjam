@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Calendar, Clock, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -10,19 +10,31 @@ export const Route = createFileRoute("/search/")({
   component: SearchPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
-      q: search.q as string || "",
+      q: (search.q as string) || "",
+      category: (search.category as string) || "",
+      tags: ((search.tags as string)?.split(",").filter(Boolean) || []) as string[],
+      series: (search.series as string) || "",
     };
   },
 });
 
 function SearchPage() {
-  const { q: query } = Route.useSearch();
+  const { q: query, category, tags, series } = Route.useSearch();
+  const navigate = useNavigate();
+
+  const hasFilters = query || category || (tags && tags.length > 0) || series;
 
   const { data: searchResults, isLoading, isError } = useQuery({
     ...orpc.post.search.queryOptions({
-      input: { query: query || "", limit: 20 },
+      input: {
+        query,
+        categoryId: category,
+        tagIds: tags,
+        seriesId: series,
+        limit: 20,
+      },
     }),
-    enabled: !!query && query.length >= 2,
+    enabled: hasFilters,
   });
 
   return (
@@ -44,14 +56,14 @@ function SearchPage() {
         </div>
 
         {/* Results */}
-        {!query ? (
+        {!hasFilters ? (
           <div className="text-center py-12">
             <Search className="mx-auto h-12 w-12 text-foreground/20 mb-4" />
             <h2 className="font-semibold text-xl text-foreground mb-2">
               Start Searching
             </h2>
             <p className="text-foreground/60 text-sm">
-              Enter a keyword to search through all blog posts
+              Enter a keyword, or select filters to search through blog posts
             </p>
           </div>
         ) : isLoading ? (
@@ -74,13 +86,15 @@ function SearchPage() {
             <div className="mb-6 border-border/30 border-b pb-4">
               <p className="text-foreground/60 text-sm">
                 Found <span className="font-semibold text-foreground">
-                  {searchResults.results.length}
+                  {searchResults.total}
                 </span>{" "}
-                result{searchResults.results.length !== 1 ? "s" : ""} for "
-                <span className="font-semibold text-foreground">"{query}"</span>
-                {searchResults.method && (
+                result{searchResults.total !== 1 ? "s" : ""}{" "}
+                {query && (
+                  <>for "<span className="font-semibold text-foreground">"{query}"</span></>
+                )}
+                {(category || tags || series) && (
                   <span className="ml-2 text-xs text-foreground/40">
-                    (via {searchResults.method})
+                    with filters
                   </span>
                 )}
               </p>

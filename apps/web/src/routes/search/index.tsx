@@ -30,8 +30,8 @@ function SearchPage() {
 
 	const hasFilters = Boolean(q || category || tags || series);
 
-	const { data: searchResults, isLoading, isError } = useQuery(
-		orpc.post.search.queryOptions({
+	const { data: searchResults, isLoading, isError } = useQuery({
+		...orpc.post.search.queryOptions({
 			input: {
 				query: q || undefined,
 				categoryId: category || undefined,
@@ -40,7 +40,8 @@ function SearchPage() {
 				limit: 20,
 			},
 		}),
-	);
+		enabled: hasFilters,
+	});
 
   return (
     <main className="min-h-screen">

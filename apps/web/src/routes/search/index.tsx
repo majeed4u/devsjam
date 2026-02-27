@@ -1,35 +1,29 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Calendar, Clock, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useQueryState } from "nuqs";
 import { orpc } from "@/utils/orpc";
-import { SearchInput } from "@/components/search/search-input";
 import { PostCard } from "@/components/post/post-card";
 
 export const Route = createFileRoute("/search/")({
   component: SearchPage,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      q: (search.q as string) || "",
-      category: (search.category as string) || "",
-      tags: ((search.tags as string)?.split(",").filter(Boolean) || []) as string[],
-      series: (search.series as string) || "",
-    };
-  },
 });
 
 function SearchPage() {
-  const { q: query, category, tags, series } = Route.useSearch();
-  const navigate = useNavigate();
+  const [query, setQuery] = useQueryState("q", { defaultValue: "" });
+  const [category, setCategory] = useQueryState("category");
+  const [tags, setTags] = useQueryState("tags");
+  const [series, setSeries] = useQueryState("series");
 
-  const hasFilters = Boolean(query || category || (tags && tags.length > 0) || series);
+  const hasFilters = Boolean(query || category || tags || series);
 
   const { data: searchResults, isLoading, isError } = useQuery(
     orpc.post.search.queryOptions({
       input: {
-        query,
+        query: query || undefined,
         categoryId: category || undefined,
-        tagIds: tags && tags.length > 0 ? tags : undefined,
+        tagIds: tags ? tags.split(",").filter(Boolean) : undefined,
         seriesId: series || undefined,
         limit: 20,
       },

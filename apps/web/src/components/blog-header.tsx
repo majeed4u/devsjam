@@ -1,5 +1,5 @@
 import { Link, Route } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
@@ -21,6 +21,7 @@ export function BlogHeader() {
     { to: "/", label: "Home" },
     { to: "/blog", label: "Blog" },
     { to: "/about", label: "About" },
+    { to: "/search", label: "Search" },
   ] as const;
 
   return (
@@ -52,6 +53,13 @@ export function BlogHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <a
+            href="/search"
+            className="rounded p-2 text-foreground/70 hover:bg-muted/50 hover:text-foreground"
+            aria-label="Search"
+          >
+            <Search className="h-5 w-5" />
+          </a>
           <ModeToggle />
           <div className="hidden md:block">
             <UserMenu />

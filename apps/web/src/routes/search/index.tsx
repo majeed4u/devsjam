@@ -8,6 +8,7 @@ import {
 	useQueryStates,
 } from "nuqs";
 import { orpc } from "@/utils/orpc";
+import { SearchInput } from "@/components/search/search-input";
 import { PostCard } from "@/components/post/post-card";
 
 const searchParams = {

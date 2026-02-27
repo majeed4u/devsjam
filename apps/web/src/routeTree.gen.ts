@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as BlogSlugIndexRouteImport } from './routes/blog/$slug/index'
@@ -44,6 +45,11 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchIndexRoute = SearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/search/': typeof SearchIndexRoute
   '/admin/analytics/': typeof AdminAnalyticsIndexRoute
   '/admin/post/': typeof AdminPostIndexRoute
   '/blog/$slug/': typeof BlogSlugIndexRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/search': typeof SearchIndexRoute
   '/admin/analytics': typeof AdminAnalyticsIndexRoute
   '/admin/post': typeof AdminPostIndexRoute
   '/blog/$slug': typeof BlogSlugIndexRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/search/': typeof SearchIndexRoute
   '/admin/analytics/': typeof AdminAnalyticsIndexRoute
   '/admin/post/': typeof AdminPostIndexRoute
   '/blog/$slug/': typeof BlogSlugIndexRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/'
     | '/blog/'
+    | '/search/'
     | '/admin/analytics/'
     | '/admin/post/'
     | '/blog/$slug/'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/blog'
+    | '/search'
     | '/admin/analytics'
     | '/admin/post'
     | '/blog/$slug'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/'
     | '/blog/'
+    | '/search/'
     | '/admin/analytics/'
     | '/admin/post/'
     | '/blog/$slug/'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  SearchIndexRoute: typeof SearchIndexRoute
   BlogSlugIndexRoute: typeof BlogSlugIndexRoute
   BlogCategoryCategoryIndexRoute: typeof BlogCategoryCategoryIndexRoute
   BlogSeriesSeriesIndexRoute: typeof BlogSeriesSeriesIndexRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/': {
+      id: '/search/'
+      path: '/search'
+      fullPath: '/search/'
+      preLoaderRoute: typeof SearchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -378,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   BlogIndexRoute: BlogIndexRoute,
+  SearchIndexRoute: SearchIndexRoute,
   BlogSlugIndexRoute: BlogSlugIndexRoute,
   BlogCategoryCategoryIndexRoute: BlogCategoryCategoryIndexRoute,
   BlogSeriesSeriesIndexRoute: BlogSeriesSeriesIndexRoute,

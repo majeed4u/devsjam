@@ -13,4 +13,7 @@ model Series {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    // Performance indexes
+    @@index([title]) // For searching series by title
 }

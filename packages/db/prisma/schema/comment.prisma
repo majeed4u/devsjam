@@ -18,4 +18,10 @@ model Comment {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    // Performance indexes
+    @@index([postId]) // For finding comments on a post
+    @@index([authorId]) // For finding user's comments
+    @@index([parentId]) // For finding replies to a comment
+    @@index([createdAt(sort: Desc)]) // For recent comments
 }

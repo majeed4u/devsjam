@@ -31,9 +31,13 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    // Performance indexes
     @@index([slug])
-    @@index([published])
-    @@index([archived])
-    @@index([createdAt])
-    @@index([seriesId, seriesOrder])
+    @@index([published, archived]) // Composite for filtering published posts
+    @@index([createdAt(sort: Desc)]) // For sorting by date
+    @@index([views(sort: Desc)]) // For popular posts
+    @@index([categoryId]) // For filtering by category
+    @@index([seriesId]) // For filtering by series
+    @@index([seriesId, seriesOrder]) // For ordered series posts
+    @@index([authorId]) // For user's posts
 }

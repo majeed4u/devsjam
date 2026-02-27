@@ -10,6 +10,9 @@ model Tag {
     posts PostTag[]
 
     createdAt DateTime @default(now())
+
+    // Performance indexes
+    @@index([name]) // For searching tags by name
 }
 
 ///////////////////////////
@@ -24,4 +27,6 @@ model PostTag {
     tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
     @@id([postId, tagId])
+    // Additional indexes for many-to-many queries
+    @@index([tagId]) // For finding posts by tag
 }

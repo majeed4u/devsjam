@@ -16,4 +16,5 @@ model Series {
 
     // Performance indexes
     @@index([title]) // For searching series by title
+    @@index([slug]) // For searching series by slug
 }

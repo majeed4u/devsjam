@@ -2,7 +2,7 @@ import { Search, X } from "lucide-react";
 import { parseAsString, useQueryStates } from "nuqs";
 
 const searchParams = {
-	q: parseAsString.withDefault(""),
+  q: parseAsString.withDefault(""),
 };
 
 interface SearchInputProps {
@@ -33,7 +33,7 @@ export function SearchInput({
   };
 
   return (
-    <div className={`relative w-full max-w-2xl ${className}`}>
+    <div className={`relative w-full max-w-2xl mx-auto ${className}`}>
       <div className="relative flex items-center">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/40 pointer-events-none" />
         <input

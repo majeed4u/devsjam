@@ -15,4 +15,5 @@ model Category {
 
     // Performance indexes
     @@index([name]) // For searching categories by name
+    @@index([slug]) // For searching categories by slug
 }

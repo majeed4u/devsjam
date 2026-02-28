@@ -120,7 +120,6 @@ const app = new Elysia()
     return response ?? new Response("Not Found", { status: 404 });
   })
   .get("/", () => "OK - DevJams - Server")
-  .use(logger())
   .listen(
     {
       port: 3000,

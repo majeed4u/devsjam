@@ -32,7 +32,8 @@
 		"db:studio": "turbo -F @devjams/db db:studio",
 		"db:generate": "turbo -F @devjams/db db:generate",
 		"db:migrate": "turbo -F @devjams/db db:migrate dev",
-		"check": "biome check --write ."
+		"check": "biome check --write .",
+		"auth:gen": "turbo -F server auth:gen"
 	},
 	"dependencies": {
 		"@devjams/env": "workspace:*",

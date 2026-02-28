@@ -13,6 +13,7 @@ model Tag {
 
     // Performance indexes
     @@index([name]) // For searching tags by name
+    @@index([slug]) // For searching tags by slug
 }
 
 ///////////////////////////

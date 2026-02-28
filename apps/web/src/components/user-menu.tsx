@@ -13,6 +13,7 @@ import { authClient } from "@/lib/auth-client";
 
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { LogOut } from "lucide-react";
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -32,14 +33,18 @@ export default function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        {session.user.name}
+      <DropdownMenuTrigger
+        render={<Button variant="outline" />}
+        className=" rounded-full"
+      >
+        {session.user.name.charAt(0).toUpperCase()}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card">
+      <DropdownMenuContent align="center" className="w-40 rounded-xs">
         <DropdownMenuGroup>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
+          <DropdownMenuItem className=" text-xs">
+            {session.user.email}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
@@ -47,12 +52,13 @@ export default function UserMenu() {
                 to: "/admin",
               });
             }}
+            className=" text-xs"
           >
             Admin Dashboard
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            variant="destructive"
+            className=" text-xs  hover:bg-secondary data-[state=open]:bg-secondary"
             onClick={() => {
               authClient.signOut({
                 fetchOptions: {
@@ -65,7 +71,7 @@ export default function UserMenu() {
               });
             }}
           >
-            Sign Out
+            Sign Out <LogOut />
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

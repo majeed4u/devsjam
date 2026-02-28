@@ -18,6 +18,7 @@ import { LogOut } from "lucide-react";
 export default function UserMenu() {
   const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
 
   if (isPending) {
     return <Skeleton className="h-9 w-24" />;
@@ -46,16 +47,18 @@ export default function UserMenu() {
             {session.user.email}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => {
-              navigate({
-                to: "/admin",
-              });
-            }}
-            className=" text-xs"
-          >
-            Admin Dashboard
-          </DropdownMenuItem>
+          {isAdmin && (
+            <DropdownMenuItem
+              className=" text-xs  hover:bg-secondary data-[state=open]:bg-secondary"
+              onClick={() => {
+                navigate({
+                  to: "/admin",
+                });
+              }}
+            >
+              Admin Dashboard
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className=" text-xs  hover:bg-secondary data-[state=open]:bg-secondary"

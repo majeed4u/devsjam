@@ -13,7 +13,7 @@ interface ViewStorage {
  * Hook to track post views with client-side rate limiting
  * Only increments view count once per hour per post per browser
  */
-export function useIncrementViews(postId: string) {
+export function useIncrementViews(postId: string | undefined) {
   const hasTrackedRef = useRef(false);
 
   // Get viewed posts from localStorage
@@ -37,6 +37,8 @@ export function useIncrementViews(postId: string) {
 
   // Check if post should be tracked (respecting cooldown)
   const shouldTrackView = (): boolean => {
+    if (!postId) return false; // No postId, don't track
+
     const viewedPosts = getViewedPosts();
     const lastViewed = viewedPosts[postId];
 
@@ -50,6 +52,8 @@ export function useIncrementViews(postId: string) {
 
   // Mark post as viewed
   const markAsViewed = () => {
+    if (!postId) return; // No postId, don't mark
+
     const viewedPosts = getViewedPosts();
     viewedPosts[postId] = Date.now();
 
@@ -86,7 +90,9 @@ export function useIncrementViews(postId: string) {
     }
 
     // Increment views
-    incrementViews.mutate({ postId });
+    if (postId) {
+      incrementViews.mutate({ postId });
+    }
   }, [postId]);
 
   return {

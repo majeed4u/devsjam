@@ -21,6 +21,9 @@ function BlogPostComponent() {
   // Still fetch all posts for sidebar/series navigation (cached by React Query)
   const { data: posts = [] } = useQuery(orpc.post.getPosts.queryOptions());
 
+  // Track post views - MUST be called before any conditional returns (Rules of Hooks)
+  useIncrementViews(post?.id);
+
   if (isLoading) {
     return (
       <main className="min-h-screen">
@@ -62,9 +65,6 @@ function BlogPostComponent() {
     title: post.title,
     coverImage: post.coverImage,
   });
-
-  // Track post views
-  useIncrementViews(post.id);
 
   const publishDate = new Date(post.createdAt).toLocaleDateString("en-US", {
     year: "numeric",

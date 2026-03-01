@@ -3,6 +3,7 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { PostView } from "@/components/PostView";
 import { SocialShare } from "@/components/post/social-share";
 import { CommentsSection } from "@/components/post/comments-section";
+import { useIncrementViews } from "@/hooks/use-increment-views";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/$slug/")({
@@ -61,6 +62,9 @@ function BlogPostComponent() {
     title: post.title,
     coverImage: post.coverImage,
   });
+
+  // Track post views
+  useIncrementViews(post.id);
 
   const publishDate = new Date(post.createdAt).toLocaleDateString("en-US", {
     year: "numeric",

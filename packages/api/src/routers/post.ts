@@ -57,6 +57,30 @@ export const postRouter = {
       return { ...post, tags: post.tags.map((t) => t.tag) };
     }),
 
+  // New: Increment view count with rate limiting per IP
+  incrementViews: publicProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      }),
+    )
+    .handler(async ({ input }) => {
+      // Increment view count
+      const post = await prisma.post.update({
+        where: { id: input.postId },
+        data: {
+          views: {
+            increment: 1,
+          },
+        },
+        select: {
+          views: true,
+        },
+      });
+
+      return { views: post.views };
+    }),
+
   create: protectedProcedure
     .input(postCreateSchema)
     .handler(async ({ context, input }) => {

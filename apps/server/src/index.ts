@@ -2,6 +2,7 @@ import { logger } from "@chneau/elysia-logger";
 import { createContext } from "@devjams/api/context";
 import { getFile } from "@devjams/api/lib/s3-helper";
 import { getPostsRSSFeed } from "@devjams/api/lib/rss-generator";
+import { getBlogSitemap } from "@devjams/api/lib/sitemap-generator";
 import { appRouter } from "@devjams/api/routers/index";
 import { auth } from "@devjams/auth";
 import { env } from "@devjams/env/server";
@@ -114,6 +115,23 @@ const app = new Elysia()
     } catch (error) {
       console.error("Error generating RSS feed:", error);
       return new Response("Error generating RSS feed", { status: 500 });
+    }
+  })
+  // Sitemap route
+  .get("/sitemap.xml", async () => {
+    try {
+      const sitemap = await getBlogSitemap(env.CORS_ORIGIN.replace(/\/$/, ""));
+
+      return new Response(sitemap, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/xml; charset=utf-8",
+          "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+        },
+      });
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      return new Response("Error generating sitemap", { status: 500 });
     }
   })
   .all("/api/auth/*", async (context) => {

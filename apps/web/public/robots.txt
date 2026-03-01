@@ -1,0 +1,12 @@
+# robots.txt for DevJams
+
+User-agent: *
+Allow: /
+
+# Disallow admin routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /rpc
+
+# Sitemap location (will be updated dynamically)
+Sitemap: https://devjams.com/sitemap.xml

@@ -1,6 +1,7 @@
 import { logger } from "@chneau/elysia-logger";
 import { createContext } from "@devjams/api/context";
 import { getFile } from "@devjams/api/lib/s3-helper";
+import { getPostsRSSFeed } from "@devjams/api/lib/rss-generator";
 import { appRouter } from "@devjams/api/routers/index";
 import { auth } from "@devjams/auth";
 import { env } from "@devjams/env/server";
@@ -96,6 +97,23 @@ const app = new Elysia()
         stack: error instanceof Error ? error.stack : undefined,
       });
       return status(404, "File not found");
+    }
+  })
+  // RSS Feed route
+  .get("/feed.xml", async () => {
+    try {
+      const rss = await getPostsRSSFeed(env.CORS_ORIGIN.replace(/\/$/, ""));
+
+      return new Response(rss, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/rss+xml; charset=utf-8",
+          "Cache-Control": "public, max-age=600", // Cache for 10 minutes
+        },
+      });
+    } catch (error) {
+      console.error("Error generating RSS feed:", error);
+      return new Response("Error generating RSS feed", { status: 500 });
     }
   })
   .all("/api/auth/*", async (context) => {

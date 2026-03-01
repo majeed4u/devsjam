@@ -4,6 +4,7 @@ import { protectedProcedure, publicProcedure } from "../index";
 import { categoryRouter } from "./category";
 import { commentRouter } from "./comment";
 import { monitoringRouter } from "./monitoring";
+import { newsletterRouter } from "./newsletter";
 import { postRouter } from "./post";
 import { seriesRouter } from "./series";
 import { tagRouter } from "./tags";
@@ -26,6 +27,7 @@ export const appRouter = {
 	tag: tagRouter,
 	monitoring: monitoringRouter,
 	comment: commentRouter,
+	newsletter: newsletterRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

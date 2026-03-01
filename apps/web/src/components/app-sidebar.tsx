@@ -7,6 +7,7 @@ import {
 	ChartBarIcon,
 	CommandIcon,
 	LayoutDashboardIcon,
+	Mail,
 } from "lucide-react";
 import type * as React from "react";
 import { NavMain } from "@/components/nav-main";
@@ -49,6 +50,11 @@ const data = {
 			title: "Archived Posts",
 			url: "/admin/post/archived",
 			icon: <Archive />,
+		},
+		{
+			title: "Newsletter",
+			url: "/admin/newsletter",
+			icon: <Mail />,
 		},
 	],
 };

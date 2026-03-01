@@ -1,0 +1,18 @@
+///////////////////////////
+// NEWSLETTER
+///////////////////////////
+
+model NewsletterSubscriber {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    active    Boolean  @default(true)
+    source    String?  @default("website") // website, import, etc.
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Performance indexes
+    @@index([email])
+    @@index([active])
+    @@index([createdAt(sort: Desc)])
+}

@@ -1,4 +1,3 @@
-import { logger } from "@chneau/elysia-logger";
 import { createContext } from "@devjams/api/context";
 import { getFile } from "@devjams/api/lib/s3-helper";
 import { getPostsRSSFeed } from "@devjams/api/lib/rss-generator";
@@ -38,7 +37,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
   ],
 });
 
-const app = new Elysia()
+new Elysia()
   .use(openapi())
   .use(serverTiming())
 

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { PostView } from "@/components/PostView";
 import { SocialShare } from "@/components/post/social-share";
+import { CommentsSection } from "@/components/post/comments-section";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/$slug/")({
@@ -321,6 +322,9 @@ function BlogPostComponent() {
                 </div>
               </nav>
             )}
+
+            {/* Comments Section */}
+            <CommentsSection postId={post.id} />
           </div>
         </div>
       </div>

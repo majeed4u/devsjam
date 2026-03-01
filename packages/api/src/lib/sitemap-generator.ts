@@ -1,4 +1,4 @@
-import { prisma } from "@devjams/db";
+import prisma from "@devjams/db";
 
 interface SitemapURL {
   loc: string;

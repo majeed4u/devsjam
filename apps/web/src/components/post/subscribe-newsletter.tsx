@@ -1,12 +1,26 @@
+import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { orpc } from "@/utils/orpc";
 
 export function SubscribeNewsletter() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  // Subscribe mutation
+  const subscribe = useMutation(
+    orpc.newsletter.subscribe.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(data.message);
+        setEmail("");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to subscribe. Please try again.");
+      },
+    }),
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,18 +29,12 @@ export function SubscribeNewsletter() {
       return;
     }
 
-    setLoading(true);
-    try {
-      // TODO: Integrate with your email service (Resend, Mailchimp, etc.)
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success("Thanks for subscribing!");
-      setEmail("");
-    } catch (err) {
-      console.error("SubscribeNewsletter subscribe error", err);
-      toast.error("Failed to subscribe. Please try again.");
-    } finally {
-      setLoading(false);
+    if (!email.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
     }
+
+    subscribe.mutate({ email });
   };
 
   return (
@@ -57,11 +65,11 @@ export function SubscribeNewsletter() {
             />
             <Button
               type="submit"
-              disabled={loading}
+              disabled={subscribe.isPending}
               className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "Subscribing..." : "Subscribe"}
-              {!loading && <ArrowRight className="h-4 w-4" />}
+              {subscribe.isPending ? "Subscribing..." : "Subscribe"}
+              {!subscribe.isPending && <ArrowRight className="h-4 w-4" />}
             </Button>
           </form>
 

@@ -3,10 +3,12 @@ import { Menu, Rss, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
+import { SERVER_URL } from "@/config";
 
 export function BlogHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const rssUrl = `${SERVER_URL}/feed.xml`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,10 +63,12 @@ export function BlogHeader() {
             <Search className="h-5 w-5" />
           </a>
           <a
-            href="/feed.xml"
+            href={rssUrl}
             className="rounded p-2 text-foreground/70 hover:bg-muted/50 hover:text-foreground"
             aria-label="RSS Feed"
             title="Subscribe to RSS feed"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <Rss className="h-5 w-5" />
           </a>

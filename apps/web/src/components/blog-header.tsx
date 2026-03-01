@@ -1,5 +1,5 @@
 import { Link, Route } from "@tanstack/react-router";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Rss, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
@@ -59,6 +59,14 @@ export function BlogHeader() {
             aria-label="Search"
           >
             <Search className="h-5 w-5" />
+          </a>
+          <a
+            href="/feed.xml"
+            className="rounded p-2 text-foreground/70 hover:bg-muted/50 hover:text-foreground"
+            aria-label="RSS Feed"
+            title="Subscribe to RSS feed"
+          >
+            <Rss className="h-5 w-5" />
           </a>
           <ModeToggle />
           <div className="hidden md:block">

@@ -44,6 +44,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         rel: "icon",
         href: "/favicon.ico",
       },
+      {
+        rel: "alternate",
+        type: "application/rss+xml",
+        href: "/feed.xml",
+        title: "DevJams RSS Feed",
+      },
     ],
   }),
 });

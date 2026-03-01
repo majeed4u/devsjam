@@ -3,10 +3,54 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { PostView } from "@/components/PostView";
 import { SocialShare } from "@/components/post/social-share";
 import { CommentsSection } from "@/components/post/comments-section";
+import { PostMetaTags } from "@/components/post/post-meta-tags";
+import { useIncrementViews } from "@/hooks/use-increment-views";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/$slug/")({
   component: BlogPostComponent,
+  head: ({ params }) => {
+    const { slug } = params;
+    const postSlug = slug || "post";
+
+    return {
+      meta: [
+        { title: `${postSlug} - DevJams` },
+        {
+          property: "og:title",
+          content: `${postSlug} - DevJams`,
+        },
+        {
+          property: "og:type",
+          content: "article",
+        },
+        {
+          property: "og:url",
+          content: `${typeof window !== "undefined" ? window.location.origin : ""}/blog/${postSlug}`,
+        },
+        {
+          property: "og:description",
+          content: "A personal blog about DevOps, infrastructure, CI/CD, and reliability. Notes from the trenches.",
+        },
+        {
+          property: "og:site_name",
+          content: "DevJams",
+        },
+        {
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
+          name: "twitter:title",
+          content: `${postSlug} - DevJams`,
+        },
+        {
+          name: "twitter:description",
+          content: "DevOps, infrastructure, CI/CD, and reliability notes from the trenches.",
+        },
+      ],
+    };
+  },
 });
 
 function BlogPostComponent() {
@@ -170,6 +214,9 @@ function BlogPostComponent() {
 
   return (
     <main className="min-h-screen">
+      {/* Dynamic meta tags for social sharing */}
+      <PostMetaTags post={post} />
+
       <div className="mx-auto max-w-4xl px-4 pt-10 pb-4 sm:px-6 lg:px-8">
         <Link
           to="/blog"

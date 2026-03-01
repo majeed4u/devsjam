@@ -148,41 +148,33 @@ export function CommentItem({
 							)}
 						</div>
 
-						{/* Actions menu */}
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									size="sm"
-									className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-								>
-									<MoreVertical className="h-4 w-4" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{!isReply && onReply && (
-									<DropdownMenuItem onClick={handleReply}>
-										<Reply className="mr-2 h-4 w-4" />
-										Reply
+						{/* Actions menu - only show for author/admin */}
+						{canEdit && (
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant="ghost"
+										size="sm"
+										className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+									>
+										<MoreVertical className="h-4 w-4" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									<DropdownMenuItem onClick={() => setIsEditing(true)}>
+										<Edit2 className="mr-2 h-4 w-4" />
+										Edit
 									</DropdownMenuItem>
-								)}
-								{canEdit && (
-									<>
-										<DropdownMenuItem onClick={() => setIsEditing(true)}>
-											<Edit2 className="mr-2 h-4 w-4" />
-											Edit
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											onClick={handleDelete}
-											className="text-destructive"
-										>
-											<Trash2 className="mr-2 h-4 w-4" />
-											Delete
-										</DropdownMenuItem>
-									</>
-								)}
-							</DropdownMenuContent>
-						</DropdownMenu>
+									<DropdownMenuItem
+										onClick={handleDelete}
+										className="text-destructive"
+									>
+										<Trash2 className="mr-2 h-4 w-4" />
+										Delete
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
 					</div>
 
 					{/* Comment content */}
@@ -213,9 +205,24 @@ export function CommentItem({
 							</div>
 						</div>
 					) : (
-						<p className="mt-1 text-foreground/80 text-sm whitespace-pre-wrap break-words">
-							{comment.content}
-						</p>
+						<div className="space-y-2">
+							<p className="text-foreground/80 text-sm whitespace-pre-wrap break-words">
+								{comment.content}
+							</p>
+
+							{/* Action buttons - always visible for replies */}
+							<div className="flex flex-wrap items-center gap-3 pt-1">
+								{!isReply && onReply && (
+									<button
+										onClick={handleReply}
+										className="text-foreground/50 text-xs hover:text-primary transition-colors flex items-center gap-1"
+									>
+										<Reply className="h-3 w-3" />
+										Reply
+									</button>
+								)}
+							</div>
+						</div>
 					)}
 
 					{/* Replies */}

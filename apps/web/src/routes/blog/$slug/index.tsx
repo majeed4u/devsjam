@@ -3,6 +3,7 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { PostView } from "@/components/PostView";
 import { SocialShare } from "@/components/post/social-share";
 import { CommentsSection } from "@/components/post/comments-section";
+import { useIncrementViews } from "@/hooks/use-increment-views";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/$slug/")({
@@ -19,6 +20,9 @@ function BlogPostComponent() {
 
   // Still fetch all posts for sidebar/series navigation (cached by React Query)
   const { data: posts = [] } = useQuery(orpc.post.getPosts.queryOptions());
+
+  // Track post views - MUST be called before any conditional returns (Rules of Hooks)
+  useIncrementViews(post?.id);
 
   if (isLoading) {
     return (

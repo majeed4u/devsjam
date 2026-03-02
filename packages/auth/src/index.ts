@@ -12,7 +12,7 @@ export const auth = betterAuth({
   trustedOrigins: [env.CORS_ORIGIN],
   emailAndPassword: {
     enabled: true,
-    disableSignUp: true, // Disable sign-up for admin accounts
+    disableSignUp: false, // Disable sign-up for admin accounts
   },
   advanced: {
     defaultCookieAttributes: {

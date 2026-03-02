@@ -1,7 +1,7 @@
 import { Link, Route } from "@tanstack/react-router";
 import { Menu, Rss, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ModeToggle } from "./mode-toggle";
+import { ThemeToggle } from "./theme-toggle";
 import UserMenu from "./user-menu";
 import { SERVER_URL } from "@/config";
 
@@ -72,7 +72,7 @@ export function BlogHeader() {
           >
             <Rss className="h-5 w-5" />
           </a>
-          <ModeToggle />
+          <ThemeToggle />
           <div className="hidden md:block">
             <UserMenu />
           </div>
@@ -99,7 +99,11 @@ export function BlogHeader() {
                 {label}
               </Link>
             ))}
-            <div className="mt-2 border-border/30 border-t pt-2">
+            <div className="mt-2 flex items-center justify-between border-border/30 border-t pt-2">
+              <span className="text-foreground/70 text-sm">Theme</span>
+              <ThemeToggle />
+            </div>
+            <div className="border-border/30 border-t pt-2">
               <UserMenu />
             </div>
           </div>

@@ -5,6 +5,7 @@ import { SocialShare } from "@/components/post/social-share";
 import { CommentsSection } from "@/components/post/comments-section";
 import { PostMetaTags } from "@/components/post/post-meta-tags";
 import { ReadingProgress } from "@/components/post/reading-progress";
+import { TableOfContents, extractHeadings } from "@/components/post/table-of-contents";
 import { useIncrementViews } from "@/hooks/use-increment-views";
 import { orpc } from "@/utils/orpc";
 
@@ -216,6 +217,9 @@ function BlogPostComponent() {
     }
   });
 
+  // Extract headings for table of contents
+  const headings = post.content ? extractHeadings(post.content) : [];
+
   return (
     <main className="min-h-screen">
       {/* Reading progress indicator */}
@@ -234,10 +238,10 @@ function BlogPostComponent() {
       </div>
 
       {/* 2-column layout: Main content + Sidebar */}
-      <div className="mx-auto max-w-4xl px-4 pb-10 sm:px-6 lg:px-8">
-        <div className="space-y-8">
+      <div className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
           {/* Main content */}
-          <div className="space-y-10">
+          <div className="space-y-10 min-w-0">
             {/* Cover Image - Hero style at the top */}
             {post.coverImage && (
               <section className="mb-8">
@@ -380,6 +384,13 @@ function BlogPostComponent() {
             {/* Comments Section */}
             <CommentsSection postId={post.id} />
           </div>
+
+          {/* Sidebar */}
+          {headings.length > 0 && (
+            <aside className="hidden lg:block">
+              <TableOfContents headings={headings} />
+            </aside>
+          )}
         </div>
       </div>
     </main>

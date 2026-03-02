@@ -145,6 +145,28 @@ export const newsletterRouter = {
 
 			return { success: true };
 		}),
+
+	// Export subscribers as CSV (admin only)
+	exportCSV: protectedProcedure.handler(async () => {
+		const subscribers = await prisma.newsletterSubscriber.findMany({
+			orderBy: { createdAt: "desc" },
+		});
+
+		// Generate CSV
+		const headers = ["Email", "Status", "Source", "Subscribed Date"];
+		const rows = subscribers.map((sub) => [
+			sub.email,
+			sub.active ? "Active" : "Inactive",
+			sub.source || "N/A",
+			new Date(sub.createdAt).toISOString(),
+		]);
+
+		const csv = [headers, ...rows]
+			.map((row) => row.map((cell) => `"${cell}"`).join(","))
+			.join("\n");
+
+		return csv;
+	}),
 };
 
 export type NewsletterRouter = typeof newsletterRouter;

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Mail, Users, TrendingUp, UserCheck, UserX, Trash2 } from "lucide-react";
+import { Mail, Users, TrendingUp, UserCheck, UserX, Trash2, Download } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,28 @@ function NewsletterAdminComponent() {
 			},
 			onError: (error) => {
 				toast.error(error.message || "Failed to delete subscriber");
+			},
+		}),
+	);
+
+	// Export CSV mutation
+	const exportCSV = useMutation(
+		orpc.newsletter.exportCSV.mutationOptions({
+			onSuccess: (csv) => {
+				// Create a blob and download the file
+				const blob = new Blob([csv], { type: "text/csv" });
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = `newsletter-subscribers-${new Date().toISOString().split("T")[0]}.csv`;
+				document.body.appendChild(a);
+				a.click();
+				window.URL.revokeObjectURL(url);
+				document.body.removeChild(a);
+				toast.success("CSV exported successfully");
+			},
+			onError: (error) => {
+				toast.error(error.message || "Failed to export CSV");
 			},
 		}),
 	);
@@ -108,6 +130,16 @@ function NewsletterAdminComponent() {
 						Manage your newsletter subscribers
 					</p>
 				</div>
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => exportCSV.mutate()}
+					disabled={exportCSV.isPending}
+					className="flex items-center gap-2"
+				>
+					<Download className="h-4 w-4" />
+					{exportCSV.isPending ? "Exporting..." : "Export CSV"}
+				</Button>
 			</div>
 
 			{/* Stats Grid */}

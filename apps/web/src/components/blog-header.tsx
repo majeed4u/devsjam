@@ -22,6 +22,7 @@ export function BlogHeader() {
   const navLinks = [
     { to: "/", label: "Home" },
     { to: "/blog", label: "Blog" },
+    { to: "/archive", label: "Archive" },
     { to: "/about", label: "About" },
     { to: "/search", label: "Search" },
   ] as const;

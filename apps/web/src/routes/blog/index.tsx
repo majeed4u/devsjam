@@ -1,8 +1,11 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQueryState } from "nuqs";
 import { PostCard } from "@/components/post/post-card";
 import { PostCardGridSkeleton } from "@/components/skeletons/post-card-skeleton";
+import { Button } from "@/components/ui/button";
 import { orpc } from "@/utils/orpc";
 
 export const Route = createFileRoute("/blog/")({
@@ -10,12 +13,28 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogComponent() {
+  const [page, setPage] = useQueryState("page", {
+		defaultValue: 1,
+		parse: (value) => (value ? parseInt(value, 10) : 1),
+		serialize: (value) => value.toString(),
+	});
+
+	const POSTS_PER_PAGE = 6;
+
   const {
     data: posts = [],
     isLoading,
     isError,
     error,
   } = useQuery(orpc.post.getPosts.queryOptions());
+
+	// Calculate pagination
+	const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+	const currentPagePosts = useMemo(() => {
+		const startIndex = (page - 1) * POSTS_PER_PAGE;
+		const endIndex = startIndex + POSTS_PER_PAGE;
+		return posts.slice(startIndex, endIndex);
+	}, [posts, page]);
 
   const { categories, tags, series } = useMemo(() => {
     const catMap = new Map<string, { name: string; slug: string }>();
@@ -116,11 +135,83 @@ function BlogComponent() {
         {isLoading ? (
           <PostCardGridSkeleton count={6} />
         ) : posts && posts.length > 0 ? (
-          <div className="space-y-8">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
+          <>
+            <div className="space-y-8">
+              {currentPagePosts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <nav
+                className="border-border/30 border-t pt-8 mt-8"
+                aria-label="Pagination"
+              >
+                <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                  <p className="text-foreground/60 text-sm">
+                    Showing {(page - 1) * POSTS_PER_PAGE + 1} to{" "}
+                   	{Math.min(page * POSTS_PER_PAGE, posts.length)} of {posts.length}{" "}
+                   	posts
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    {/* Previous Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                     	onClick={() => setPage(Math.max(1, page - 1))}
+                     	disabled={page === 1}
+                     	className="gap-1"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+
+                    {/* Page Numbers */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                       	let pageNum;
+                       	if (totalPages <= 5) {
+                       	  pageNum = i + 1;
+                       	} else if (page <= 3) {
+                       	  pageNum = i + 1;
+                       	} else if (page >= totalPages - 2) {
+                       	  pageNum = totalPages - 4 + i;
+                       	} else {
+                       	  pageNum = page - 2 + i;
+                       	}
+
+                       	return (
+                       	  <Button
+                       	    key={pageNum}
+                       	    variant={page === pageNum ? "default" : "outline"}
+                       	    size="sm"
+                       	    onClick={() => setPage(pageNum)}
+                       	    className="min-w-[2.5rem]"
+                       	  >
+                       	    {pageNum}
+                       	  </Button>
+                       	);
+                      })}
+                    </div>
+
+                    {/* Next Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                     	onClick={() => setPage(Math.min(totalPages, page + 1))}
+                     	disabled={page === totalPages}
+                     	className="gap-1"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </nav>
+            )}
+          </>
         ) : isError ? (
           <p className="text-foreground/50 text-sm">
             Couldn’t load posts. {error?.message ?? "Try again later."}

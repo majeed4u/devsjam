@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as ArchiveIndexRouteImport } from './routes/archive/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
 const SearchIndexRoute = SearchIndexRouteImport.update({
   id: '/search/',
   path: '/search/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/archive/': typeof ArchiveIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/search/': typeof SearchIndexRoute
   '/admin/analytics/': typeof AdminAnalyticsIndexRoute
   '/admin/comments/': typeof AdminCommentsIndexRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/archive': typeof ArchiveIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/profile': typeof ProfileIndexRoute
   '/search': typeof SearchIndexRoute
   '/admin/analytics': typeof AdminAnalyticsIndexRoute
   '/admin/comments': typeof AdminCommentsIndexRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/archive/': typeof ArchiveIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/search/': typeof SearchIndexRoute
   '/admin/analytics/': typeof AdminAnalyticsIndexRoute
   '/admin/comments/': typeof AdminCommentsIndexRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/archive/'
     | '/blog/'
+    | '/profile/'
     | '/search/'
     | '/admin/analytics/'
     | '/admin/comments/'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/archive'
     | '/blog'
+    | '/profile'
     | '/search'
     | '/admin/analytics'
     | '/admin/comments'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/archive/'
     | '/blog/'
+    | '/profile/'
     | '/search/'
     | '/admin/analytics/'
     | '/admin/comments/'
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ArchiveIndexRoute: typeof ArchiveIndexRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
   BlogSlugIndexRoute: typeof BlogSlugIndexRoute
   BlogCategoryCategoryIndexRoute: typeof BlogCategoryCategoryIndexRoute
@@ -316,6 +329,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search/'
       preLoaderRoute: typeof SearchIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -461,6 +481,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ArchiveIndexRoute: ArchiveIndexRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
   BlogSlugIndexRoute: BlogSlugIndexRoute,
   BlogCategoryCategoryIndexRoute: BlogCategoryCategoryIndexRoute,

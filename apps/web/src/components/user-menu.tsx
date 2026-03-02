@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronsUpDown, LogOut, LayoutDashboard } from "lucide-react";
+import { ChevronsUpDown, LogOut, LayoutDashboard, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,8 +59,15 @@ export default function UserMenu() {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {isAdmin && (
-          <DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={() => navigate({ to: "/profile" })}
+            className="cursor-pointer"
+          >
+            <User className="mr-2 h-4 w-4" />
+            Profile
+          </DropdownMenuItem>
+          {isAdmin && (
             <DropdownMenuItem
               onClick={() => navigate({ to: "/admin" })}
               className="cursor-pointer"
@@ -68,9 +75,9 @@ export default function UserMenu() {
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Admin Dashboard
             </DropdownMenuItem>
-          </DropdownMenuGroup>
-        )}
-        {isAdmin && <DropdownMenuSeparator />}
+          )}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={() =>

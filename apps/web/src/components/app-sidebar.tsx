@@ -8,6 +8,7 @@ import {
 	CommandIcon,
 	LayoutDashboardIcon,
 	Mail,
+	MessageCircle,
 } from "lucide-react";
 import type * as React from "react";
 import { NavMain } from "@/components/nav-main";
@@ -55,6 +56,11 @@ const data = {
 			title: "Newsletter",
 			url: "/admin/newsletter",
 			icon: <Mail />,
+		},
+		{
+			title: "Comments",
+			url: "/admin/comments",
+			icon: <MessageCircle />,
 		},
 	],
 };

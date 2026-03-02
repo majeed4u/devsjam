@@ -14,6 +14,32 @@ const commentInclude = {
 } as const;
 
 export const commentRouter = {
+	// Get all comments for admin (protected)
+	getAllForAdmin: protectedProcedure.handler(async () => {
+		const comments = await prisma.comment.findMany({
+			include: {
+				...commentInclude,
+				post: {
+					select: {
+						id: true,
+						title: true,
+						slug: true,
+					},
+				},
+				replies: {
+					include: commentInclude,
+					orderBy: { createdAt: "asc" },
+				},
+			},
+			orderBy: { createdAt: "desc" },
+		});
+
+		// Filter to only top-level comments (no parent)
+		const topLevelComments = comments.filter((c) => !c.parentId);
+
+		return topLevelComments;
+	}),
+
 	// Get all comments for a post (public)
 	getByPost: publicProcedure
 		.input(z.object({ postId: z.string() }))

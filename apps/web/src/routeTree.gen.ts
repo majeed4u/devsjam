@@ -19,6 +19,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as BlogSlugIndexRouteImport } from './routes/blog/$slug/index'
 import { Route as AdminPostIndexRouteImport } from './routes/admin/post/index'
 import { Route as AdminNewsletterIndexRouteImport } from './routes/admin/newsletter/index'
+import { Route as AdminCommentsIndexRouteImport } from './routes/admin/comments/index'
 import { Route as AdminAnalyticsIndexRouteImport } from './routes/admin/analytics/index'
 import { Route as BlogTagTagIndexRouteImport } from './routes/blog/tag/$tag/index'
 import { Route as BlogSeriesSeriesIndexRouteImport } from './routes/blog/series/$series/index'
@@ -78,6 +79,11 @@ const AdminNewsletterIndexRoute = AdminNewsletterIndexRouteImport.update({
   path: '/newsletter/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminCommentsIndexRoute = AdminCommentsIndexRouteImport.update({
+  id: '/comments/',
+  path: '/comments/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminAnalyticsIndexRoute = AdminAnalyticsIndexRouteImport.update({
   id: '/analytics/',
   path: '/analytics/',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/search/': typeof SearchIndexRoute
   '/admin/analytics/': typeof AdminAnalyticsIndexRoute
+  '/admin/comments/': typeof AdminCommentsIndexRoute
   '/admin/newsletter/': typeof AdminNewsletterIndexRoute
   '/admin/post/': typeof AdminPostIndexRoute
   '/blog/$slug/': typeof BlogSlugIndexRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/search': typeof SearchIndexRoute
   '/admin/analytics': typeof AdminAnalyticsIndexRoute
+  '/admin/comments': typeof AdminCommentsIndexRoute
   '/admin/newsletter': typeof AdminNewsletterIndexRoute
   '/admin/post': typeof AdminPostIndexRoute
   '/blog/$slug': typeof BlogSlugIndexRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/search/': typeof SearchIndexRoute
   '/admin/analytics/': typeof AdminAnalyticsIndexRoute
+  '/admin/comments/': typeof AdminCommentsIndexRoute
   '/admin/newsletter/': typeof AdminNewsletterIndexRoute
   '/admin/post/': typeof AdminPostIndexRoute
   '/blog/$slug/': typeof BlogSlugIndexRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/search/'
     | '/admin/analytics/'
+    | '/admin/comments/'
     | '/admin/newsletter/'
     | '/admin/post/'
     | '/blog/$slug/'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/search'
     | '/admin/analytics'
+    | '/admin/comments'
     | '/admin/newsletter'
     | '/admin/post'
     | '/blog/$slug'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/search/'
     | '/admin/analytics/'
+    | '/admin/comments/'
     | '/admin/newsletter/'
     | '/admin/post/'
     | '/blog/$slug/'
@@ -328,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNewsletterIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/comments/': {
+      id: '/admin/comments/'
+      path: '/comments'
+      fullPath: '/admin/comments/'
+      preLoaderRoute: typeof AdminCommentsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/analytics/': {
       id: '/admin/analytics/'
       path: '/analytics'
@@ -390,6 +409,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAnalyticsIndexRoute: typeof AdminAnalyticsIndexRoute
+  AdminCommentsIndexRoute: typeof AdminCommentsIndexRoute
   AdminNewsletterIndexRoute: typeof AdminNewsletterIndexRoute
   AdminPostIndexRoute: typeof AdminPostIndexRoute
   AdminPostArchivedIndexRoute: typeof AdminPostArchivedIndexRoute
@@ -401,6 +421,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminAnalyticsIndexRoute: AdminAnalyticsIndexRoute,
+  AdminCommentsIndexRoute: AdminCommentsIndexRoute,
   AdminNewsletterIndexRoute: AdminNewsletterIndexRoute,
   AdminPostIndexRoute: AdminPostIndexRoute,
   AdminPostArchivedIndexRoute: AdminPostArchivedIndexRoute,

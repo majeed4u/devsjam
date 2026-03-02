@@ -4,6 +4,7 @@ import { PostView } from "@/components/PostView";
 import { SocialShare } from "@/components/post/social-share";
 import { CommentsSection } from "@/components/post/comments-section";
 import { PostMetaTags } from "@/components/post/post-meta-tags";
+import { ReadingProgress } from "@/components/post/reading-progress";
 import { useIncrementViews } from "@/hooks/use-increment-views";
 import { orpc } from "@/utils/orpc";
 
@@ -217,6 +218,9 @@ function BlogPostComponent() {
 
   return (
     <main className="min-h-screen">
+      {/* Reading progress indicator */}
+      <ReadingProgress />
+
       {/* Dynamic meta tags for social sharing */}
       <PostMetaTags post={post} />
 
@@ -329,7 +333,7 @@ function BlogPostComponent() {
               </div>
             </section>
 
-            <section>
+            <section id="post-content">
               <PostView post={post} />
             </section>
 
